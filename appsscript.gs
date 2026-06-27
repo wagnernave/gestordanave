@@ -7,7 +7,7 @@
 
 const PLANILHA_ID = '18dOTG1kjP-xfKQa1FbtBn-WbAZg3NYwXU2dDaELB7n0';
 // Snapshots e novas_atividades.json são armazenados na pasta .gestor-nave
-const NA_FOLDER_NAME = '.gestor-nave';
+const NA_FOLDER_NAME = 'snaps';
 
 function doGet(e) {
   const params = e.parameter;
