@@ -27,6 +27,8 @@ function doGet(e) {
     const snap = gerarSnapshot();
     const limpo = limparSnapshots();
     result = { ok: true, snapshot: snap, limpeza: limpo };
+  } else if (params.action === 'migrarSnapshots') {
+    result = migrarSnapshots();
   } else if (params.action === 'getNovasAtividadesDrive') {
     result = getNovasAtividadesDrive();
   } else if (params.action === 'salvarNovaAtividadeDrive') {
@@ -443,8 +445,26 @@ function gerarSnapshot() {
   return { ok: true, timestamp: timestamp, resultados: resultados };
 }
 
+function migrarSnapshots() {
+  var destino = getNAFolder_();
+  var origem = DriveApp.getFolderById('18ynJteC2nvWI3AlIjaGqUEWd29jBF1eg');
+  var arquivos = origem.getFiles();
+  var count = 0;
+  while (arquivos.hasNext()) {
+    var arq = arquivos.next();
+    var nome = arq.getName();
+    // só copia se ainda não existir no destino
+    var existentes = destino.getFilesByName(nome);
+    if (!existentes.hasNext()) {
+      arq.makeCopy(nome, destino);
+      count++;
+    }
+  }
+  return { ok: true, migrados: count };
+}
+
 function obterPastaSnapshots() {
-  return DriveApp.getFolderById('18ynJteC2nvWI3AlIjaGqUEWd29jBF1eg');
+  return getNAFolder_();
 }
 
 function gerarCSV(headers, rows) {
