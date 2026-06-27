@@ -444,7 +444,7 @@ function gerarSnapshot() {
 }
 
 function obterPastaSnapshots() {
-  return getNAFolder_();
+  return DriveApp.getFolderById('18ynJteC2nvWI3AlIjaGqUEWd29jBF1eg');
 }
 
 function gerarCSV(headers, rows) {
