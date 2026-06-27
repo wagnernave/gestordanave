@@ -1562,11 +1562,17 @@ async function carregarDasPlanilhas() {
 
 async function afterLoad() {
   try {
-    const rNA = await fetch('novas_atividades.json').then(r=>r.json());
-    NOVAS_AULAS = Array.isArray(rNA) ? rNA : [];
+    const rNA = await fetch(`${SCRIPT_URL}?action=getNovasAulas`).then(r=>r.json());
+    if (rNA.ok && Array.isArray(rNA.rows)) NOVAS_AULAS = rNA.rows;
+    else throw new Error('API returned invalid data');
   } catch (e) {
-    console.warn('[novas_atividades] erro:', e);
-    NOVAS_AULAS = [];
+    console.warn('[novas_atividades] API erro, fallback p/ JSON:', e);
+    try {
+      const rNA2 = await fetch('novas_atividades.json').then(r=>r.json());
+      NOVAS_AULAS = Array.isArray(rNA2) ? rNA2 : [];
+    } catch (e2) {
+      NOVAS_AULAS = [];
+    }
   }
 
   const syncTime = 'Última sincronização: ' + new Date().toLocaleTimeString('pt-BR');
@@ -3492,18 +3498,59 @@ function salvarNovaAtividade() {
   }
   $('naf-error').style.display = 'none';
 
-  if (nafEditandoRow !== null) {
-    Object.assign(NOVAS_AULAS[nafEditandoRow], dados);
-    nafEditandoRow = null;
-  } else {
-    dados.id = String(Date.now());
-    dados.cadastroEm = new Date().toISOString();
-    NOVAS_AULAS.push(dados);
-  }
+  const btn = $('naf-salvar-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
 
-  $('naf-form-header').textContent = 'Nova Atividade';
-  limparNAForm();
-  renderNovasAtividades();
+  const isEditing = nafEditandoRow !== null;
+  const item = isEditing ? NOVAS_AULAS[nafEditandoRow] : null;
+  const params = new URLSearchParams();
+
+  if (isEditing && item && item._row) {
+    // update existing row in sheet
+    params.set('action', 'updateNovaAula');
+    params.set('row', item._row);
+  } else if (isEditing && item && !item._row) {
+    // was created locally, save as new in sheet
+    params.set('action', 'addAtividadeReturnRow');
+  } else {
+    params.set('action', 'addAtividadeReturnRow');
+  }
+  params.set('nome', dados.nome);
+  params.set('tipo', dados.tipo);
+  params.set('data', dados.data);
+  if (dados.eixo)        params.set('eixo', dados.eixo);
+  if (dados.horario)     params.set('horario', dados.horario);
+  if (dados.turmaAberta) params.set('turmaAberta', dados.turmaAberta);
+  if (dados.parceria)    params.set('parceria', dados.parceria);
+  if (dados.instrutores) params.set('instrutores', dados.instrutores);
+  if (dados.local)       params.set('local', dados.local);
+  if (dados.publicoAlvo) params.set('publicoAlvo', dados.publicoAlvo);
+  if (!isEditing || !item || !item._row) params.set('id', String(Date.now()));
+  if (!isEditing || !item || !item._row) params.set('cadastroEm', new Date().toISOString());
+
+  fetch(`${SCRIPT_URL}?${params}`).then(r => r.json()).then(json => {
+    if (!json.ok) throw new Error(json.error || 'Erro ao salvar');
+
+    if (isEditing && item) {
+      Object.assign(item, dados);
+      if (json.row) item._row = json.row;
+    } else {
+      dados.id = params.get('id');
+      dados.cadastroEm = params.get('cadastroEm');
+      dados._row = json.row || null;
+      NOVAS_AULAS.push(dados);
+    }
+
+    nafEditandoRow = null;
+    $('naf-form-header').textContent = 'Nova Atividade';
+    limparNAForm();
+    renderNovasAtividades();
+    mostrarToast('✅ Atividade salva na planilha!');
+  }).catch(err => {
+    mostrarToast('❌ Erro ao salvar: ' + err.message);
+  }).finally(() => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar Atividade'; }
+  });
 }
 
 function editarNA(idx) {
@@ -3521,6 +3568,10 @@ function excluirNA(idx) {
   NOVAS_AULAS.splice(idx, 1);
   if (nafEditandoRow === idx) { limparNAForm(); }
   renderNovasAtividades();
+  // Delete from sheet if it has a row reference
+  if (item._row) {
+    fetch(`${SCRIPT_URL}?action=deleteNovaAula&row=${item._row}`).then(r => r.json()).catch(() => {});
+  }
 }
 
 function getWeekKey(d) {
