@@ -18,8 +18,6 @@ function doGet(e) {
     result = updateStatus(params);
   } else if (params.action === 'addAtividade') {
     result = addAtividade(params);
-  } else if (params.action === 'updateNovaAula') {
-    result = updateNovaAula(params);
   } else if (params.action === 'getSnapshotData') {
     result = getSnapshotData(params);
   } else if (params.action === 'snapshot') {
@@ -28,12 +26,12 @@ function doGet(e) {
     const snap = gerarSnapshot();
     const limpo = limparSnapshots();
     result = { ok: true, snapshot: snap, limpeza: limpo };
-  } else if (params.action === 'deleteNovaAula') {
-    result = deleteNovaAula(params);
-  } else if (params.action === 'getNovasAulas') {
-    result = getNovasAulas();
-  } else if (params.action === 'addAtividadeReturnRow') {
-    result = addAtividadeReturnRow(params);
+  } else if (params.action === 'getNovasAtividadesDrive') {
+    result = getNovasAtividadesDrive();
+  } else if (params.action === 'salvarNovaAtividadeDrive') {
+    result = salvarNovaAtividadeDrive(params);
+  } else if (params.action === 'excluirNovaAtividadeDrive') {
+    result = excluirNovaAtividadeDrive(params);
   } else if (params.action === 'getInstrutores') {
     result = getInstrutores();
   } else if (params.action === 'addInstrutor') {
@@ -198,63 +196,81 @@ function updateNovaAula(params) {
 }
 
 // ============================================================
-//  DELETE — linha em novas_aulas
+//  NOVAS ATIVIDADES — JSON no Drive (pasta oculta .gestor-nave)
 // ============================================================
-function deleteNovaAula(params) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('novas_aulas');
-  if (!sheet) throw new Error('Aba "novas_aulas" não encontrada.');
-  const row = parseInt(params.row);
-  if (!row || row < 2) throw new Error('Linha inválida: ' + params.row);
-  sheet.getRange(row, 1, 1, 23).clearContent();
+
+const NA_FOLDER_NAME = '.gestor-nave'; // pasta oculta no Drive
+const NA_FILE_NAME = 'novas_atividades.json';
+
+function getNAFolder_() {
+  var folders = DriveApp.getFoldersByName(NA_FOLDER_NAME);
+  if (folders.hasNext()) return folders.next();
+  return DriveApp.createFolder(NA_FOLDER_NAME);
+}
+
+function lerNAJson_() {
+  var folder = getNAFolder_();
+  var files = folder.getFilesByName(NA_FILE_NAME);
+  if (!files.hasNext()) return [];
+  var content = files.next().getBlob().getDataAsString();
+  var data = JSON.parse(content);
+  return Array.isArray(data) ? data : [];
+}
+
+function escreverNAJson_(rows) {
+  var folder = getNAFolder_();
+  var files = folder.getFilesByName(NA_FILE_NAME);
+  var json = JSON.stringify(rows, null, 2);
+  if (files.hasNext()) {
+    files.next().setContent(json);
+  } else {
+    folder.createFile(NA_FILE_NAME, json);
+  }
+}
+
+function getNovasAtividadesDrive() {
+  return { ok: true, rows: lerNAJson_() };
+}
+
+function salvarNovaAtividadeDrive(params) {
+  var rows = lerNAJson_();
+  var item = {
+    id: params.id || String(Date.now()),
+    eixo: params.eixo || '',
+    nome: params.nome || '',
+    tipo: params.tipo || '',
+    data: params.data || '',
+    horario: params.horario || '',
+    turmaAberta: params.turmaAberta || '',
+    parceria: params.parceria || '',
+    instrutores: params.instrutores || '',
+    local: params.local || '',
+    publicoAlvo: params.publicoAlvo || '',
+    cadastroEm: params.cadastroEm || new Date().toISOString()
+  };
+
+  if (params.id) {
+    var idx = rows.findIndex(function(r) { return r.id === params.id; });
+    if (idx >= 0) {
+      rows[idx] = item;
+    } else {
+      rows.push(item);
+    }
+  } else {
+    rows.push(item);
+  }
+
+  escreverNAJson_(rows);
+  return { ok: true, id: item.id };
+}
+
+function excluirNovaAtividadeDrive(params) {
+  if (!params.id) return { ok: false, error: 'id obrigatório' };
+  var rows = lerNAJson_();
+  var idx = rows.findIndex(function(r) { return r.id === params.id; });
+  if (idx >= 0) rows.splice(idx, 1);
+  escreverNAJson_(rows);
   return { ok: true };
-}
-
-function getNovasAulas() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('novas_aulas');
-  if (!sheet) throw new Error('Aba "novas_aulas" não encontrada.');
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { ok: true, rows: [] };
-  const data = sheet.getRange(2, 1, lastRow - 1, 23).getValues();
-  const rows = [];
-  data.forEach(function(row, i) {
-    if (!row[1] || String(row[1]).trim() === '') return; // skip empty rows (B=nome)
-    rows.push({
-      _row: i + 2,
-      id: String(row[0] || '').trim() || String(Date.now() + i),
-      eixo: String(row[0] || '').trim(),       // A = eixo
-      nome: String(row[1] || '').trim(),        // B = nome
-      tipo: String(row[2] || '').trim(),        // C = tipo
-      data: String(row[3] || '').trim(),        // D = data
-      horario: String(row[9] || '').trim(),     // J = horario
-      turmaAberta: String(row[12] || '').trim(),// M = turmaAberta
-      parceria: String(row[13] || '').trim(),   // N = parceria
-      instrutores: String(row[14] || '').trim(),// O = instrutores
-      local: String(row[15] || '').trim(),      // P = local
-      publicoAlvo: String(row[22] || '').trim(),// W = publicoAlvo
-      cadastroEm: String(row[6] || '').trim(),  // G = cadastroEm (if exists)
-    });
-  });
-  return { ok: true, rows: rows };
-}
-
-function addAtividadeReturnRow(params) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('novas_aulas');
-  if (!sheet) throw new Error('Aba "novas_aulas" não encontrada.');
-  const lastRow = sheet.getLastRow();
-  const nextRow = Math.max(lastRow + 1, 2);
-  if (params.id)          sheet.getRange(nextRow, 1).setValue(params.id);
-  if (params.eixo)        sheet.getRange(nextRow, 1).setValue(params.eixo);
-  if (params.nome)        sheet.getRange(nextRow, 2).setValue(params.nome);
-  if (params.tipo)        sheet.getRange(nextRow, 3).setValue(params.tipo);
-  if (params.data)        sheet.getRange(nextRow, 4).setValue(params.data);
-  if (params.cadastroEm)  sheet.getRange(nextRow, 7).setValue(params.cadastroEm);
-  if (params.horario)     sheet.getRange(nextRow, 10).setValue(params.horario);
-  if (params.turmaAberta) sheet.getRange(nextRow, 13).setValue(params.turmaAberta);
-  if (params.parceria)    sheet.getRange(nextRow, 14).setValue(params.parceria);
-  if (params.instrutores) sheet.getRange(nextRow, 15).setValue(params.instrutores);
-  if (params.local)       sheet.getRange(nextRow, 16).setValue(params.local);
-  if (params.publicoAlvo) sheet.getRange(nextRow, 23).setValue(params.publicoAlvo);
-  return { ok: true, row: nextRow };
 }
 
 // ============================================================
