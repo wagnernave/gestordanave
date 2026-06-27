@@ -6,7 +6,8 @@
 // ============================================================
 
 const PLANILHA_ID = '18dOTG1kjP-xfKQa1FbtBn-WbAZg3NYwXU2dDaELB7n0';
-const SNAPSHOT_FOLDER_ID = '18ynJteC2nvWI3AlIjaGqUEWd29jBF1eg';
+// Snapshots e novas_atividades.json são armazenados na pasta .gestor-nave
+const NA_FOLDER_NAME = '.gestor-nave';
 
 function doGet(e) {
   const params = e.parameter;
@@ -199,7 +200,6 @@ function updateNovaAula(params) {
 //  NOVAS ATIVIDADES — JSON no Drive (pasta oculta .gestor-nave)
 // ============================================================
 
-const NA_FOLDER_NAME = '.gestor-nave'; // pasta oculta no Drive
 const NA_FILE_NAME = 'novas_atividades.json';
 
 function getNAFolder_() {
@@ -444,7 +444,7 @@ function gerarSnapshot() {
 }
 
 function obterPastaSnapshots() {
-  return DriveApp.getFolderById(SNAPSHOT_FOLDER_ID);
+  return getNAFolder_();
 }
 
 function gerarCSV(headers, rows) {
