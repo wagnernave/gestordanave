@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "nome": "Diego Silva",
+    "nickname": "DIEGO",
+    "admin": false,
+    "tipo": "INSTRUTOR",
+    "nascimento": "",
+    "idade": "",
+    "telefone": "",
+    "email": "",
+    "endereco": "",
+    "obs": "",
+    "cadastroEm": "2026-01-15T10:00:00.000Z",
+    "ativo": true
+  },
+  {
+    "id": "2",
+    "nome": "Gabriel Santos",
+    "nickname": "GABRIEL",
+    "admin": false,
+    "tipo": "INSTRUTOR",
+    "nascimento": "",
+    "idade": "",
+    "telefone": "",
+    "email": "",
+    "endereco": "",
+    "obs": "",
+    "cadastroEm": "2026-01-15T10:00:00.000Z",
+    "ativo": true
+  },
+  {
+    "id": "3",
+    "nome": "Allan Pereira",
+    "nickname": "ALLAN",
+    "admin": false,
+    "tipo": "AGENTE EDUCACIONAL",
+    "nascimento": "",
+    "idade": "",
+    "telefone": "",
+    "email": "",
+    "endereco": "",
+    "obs": "",
+    "cadastroEm": "2026-01-15T10:00:00.000Z",
+    "ativo": true
+  },
+  {
+    "id": "4",
+    "nome": "Wagner",
+    "nickname": "WAGNER",
+    "admin": true,
+    "tipo": "AGENTE EDUCACIONAL",
+    "nascimento": "",
+    "idade": "",
+    "telefone": "",
+    "email": "",
+    "endereco": "",
+    "obs": "",
+    "cadastroEm": "2026-01-15T10:00:00.000Z",
+    "ativo": true
+  }
+]

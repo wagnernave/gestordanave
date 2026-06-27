@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1",
+    "eixo": "Tecnologia",
+    "nome": "Oficina de Robótica",
+    "tipo": "Oficina",
+    "data": "15/07/2026",
+    "horario": "14:00",
+    "turmaAberta": "Sim",
+    "parceria": "",
+    "instrutores": "DIEGO/GABRIEL",
+    "local": "Lab de Tecnologia",
+    "publicoAlvo": "Jovens 12-17 anos",
+    "cadastroEm": "2026-06-20T10:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "eixo": "Arte",
+    "nome": "Aula de Pintura",
+    "tipo": "Curso",
+    "data": "22/07/2026",
+    "horario": "10:00",
+    "turmaAberta": "Sim",
+    "parceria": "Instituto Cultural",
+    "instrutores": "ALLAN",
+    "local": "Sala 3",
+    "publicoAlvo": "Adultos",
+    "cadastroEm": "2026-06-20T10:00:00.000Z"
+  },
+  {
+    "id": "3",
+    "eixo": "Esporte",
+    "nome": "Campeonato de Futebol",
+    "tipo": "Evento",
+    "data": "29/07/2026",
+    "horario": "09:00",
+    "turmaAberta": "Não",
+    "parceria": "Prefeitura",
+    "instrutores": "DIEGO",
+    "local": "Quadra",
+    "publicoAlvo": "Jovens 14-20 anos",
+    "cadastroEm": "2026-06-20T10:00:00.000Z"
+  }
+]
