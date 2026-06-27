@@ -3592,7 +3592,7 @@ async function carregarConfigUrl() {
   if (!input) return;
   try {
     input.placeholder = 'Carregando...';
-    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/database1!B1?key=${API_KEY}`);
+    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/mes1!B1?key=${API_KEY}`);
     if (!r.ok) { input.placeholder = 'Não foi possível carregar'; input.value = ''; return; }
     const json = await r.json();
     const val = json.values?.[0]?.[0] || '';
