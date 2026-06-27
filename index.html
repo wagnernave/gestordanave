@@ -1744,17 +1744,53 @@ function atualizarDownloadBtn() {
   el.innerHTML = `⬇️ Baixar Agenda · ${label}`;
 }
 
+function getNAMonth(na) {
+  if (!na || !na.data) return -1;
+  const p = na.data.split('/');
+  if (p.length !== 3) return -1;
+  return parseInt(p[1]) - 1;
+}
+
+function naToCard(na) {
+  return {
+    id: 'na_' + (na.id || Math.random().toString(36).slice(2, 8)),
+    san: na.eixo || '',
+    nome: na.nome || '',
+    tipo: na.tipo || '',
+    eixo: na.eixo || '',
+    data: na.data,
+    horario: na.horario || '',
+    instrutores: na.instrutores || '',
+    local: na.local || '',
+    turmaAberta: na.turmaAberta || '',
+    parceria: na.parceria || '',
+    publicoAlvo: na.publicoAlvo || '',
+    status: 'CONFIRMADA',
+    _na: true,
+  };
+}
+
 function renderizar() {
   initSort();
   const isDb1 = abaAtiva === 'db1';
-  const total = isDb1 ? DB1.length : DB2.length;
-  let dados = (isDb1 ? DB1 : DB2).filter(item => matchesSearch(item, searchTerm));
+  const targetMonth = isDb1 ? MES_ATUAL : PROX_MES;
+  const targetYear = isDb1 ? ANO_ATUAL : PROX_ANO;
+  const src = isDb1 ? DB1 : DB2;
+  let dados = src.filter(item => matchesSearch(item, searchTerm));
+  // Add novas atividades that belong to this month
+  (NOVAS_AULAS || []).forEach(na => {
+    if (getNAMonth(na) === targetMonth && na.data && na.data.includes('/' + String(targetYear))) {
+      const card = naToCard(na);
+      if (matchesSearch(card, searchTerm)) dados.push(card);
+    }
+  });
+  const totalBase = isDb1 ? DB1.length : DB2.length;
   dados = sortCards(dados);
   atualizarLabels();
   const countEl = isDb1 ? $('section-count') : $('section-count-db2');
   if (countEl) {
     countEl.textContent = dados.length;
-    countEl.title = dados.length === total ? '' : dados.length + ' de ' + total;
+    countEl.title = totalBase ? dados.length + ' (' + totalBase + ' da planilha)' : '';
   }
   const badge1 = $('badge1');
   const badge2 = $('badge2');
@@ -1768,7 +1804,6 @@ function renderizar() {
     return;
   }
 
-  const dbKey = abaAtiva;
   let html = '<div class="cards">';
   dados.forEach((item, i) => {
     const s = item.status || 'CONFIRMADA';
@@ -1781,8 +1816,13 @@ function renderizar() {
     if (item.instrutores) meta.push(`<span class="card-meta-item"><span class="ico">👤</span>${item.instrutores}</span>`);
     if (item.eixo) meta.push(`<span class="card-meta-item"><span class="ico">🏷️</span>${item.eixo}</span>`);
 
+    const onclick = item._na
+      ? `navegar('novasatividades')`
+      : `abrirModal('${abaAtiva}',${src.indexOf(item)})`;
+    const extraClass = item._na ? ' card-na' : '';
+
     html += `
-      <div class="card status-${s} tipo-${tipoClass}" onclick="abrirModal('${dbKey}',${i})">
+      <div class="card status-${s} tipo-${tipoClass}${extraClass}" onclick="${onclick}">
         <div class="card-top">
           <span class="card-san">${item.san || item.id || ''}</span>
           <span class="card-tipo">${item.tipo || '—'}</span>
