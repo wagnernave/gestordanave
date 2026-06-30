@@ -281,6 +281,33 @@
   .last-sync {
     margin-left: auto; font-size: 11px; color: var(--text3);
   }
+  .section-header .filter-group {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .filter-btn {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+    color: var(--text2); transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+  .filter-btn .badge { background: var(--accent); color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 9px; margin-left: 4px; }
+  .filter-dropdown {
+    position: absolute; top: 100%; left: 0; z-index: 100;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3); padding: 6px; min-width: 180px;
+    display: none; max-height: 260px; overflow-y: auto;
+  }
+  .filter-dropdown.open { display: block; }
+  .filter-dropdown-item {
+    display: block; width: 100%; text-align: left;
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    color: var(--text2); background: none; border: none; font-family: 'DM Sans', sans-serif;
+    transition: background 0.1s;
+  }
+  .filter-dropdown-item:hover { background: var(--bg3); color: var(--text); }
+  .filter-dropdown-item.active { background: var(--accent-glow); color: var(--accent); font-weight: 700; }
 
 .cards {
   display: grid;
@@ -987,9 +1014,20 @@
 
     <!-- ─── PAGE: DB1 (Mês Atual) ─── -->
     <div class="page" id="page-db1">
-      <div class="section-header">
+      <div class="section-header" style="position:relative;">
         <h2 id="section-title">Mês Atual</h2>
         <span class="count" id="section-count">0</span>
+        <div class="filter-group">
+          <button class="filter-btn" id="sort-btn-db1" onclick="toggleSort('db1')" title="Ordenar por data">📅 Organizar</button>
+          <div style="position:relative;">
+            <button class="filter-btn" id="filter-tipo-btn-db1" onclick="toggleDropdown('tipo','db1')" title="Filtrar por tipo">🏷️ Tipo</button>
+            <div class="filter-dropdown" id="dropdown-tipo-db1"></div>
+          </div>
+          <div style="position:relative;">
+            <button class="filter-btn" id="filter-inst-btn-db1" onclick="toggleDropdown('inst','db1')" title="Filtrar por instrutor">👤 Instrutor</button>
+            <div class="filter-dropdown" id="dropdown-inst-db1"></div>
+          </div>
+        </div>
         <span class="last-sync" id="last-sync-db1">—</span>
       </div>
       <div id="content" style="min-height:200px;">
@@ -1002,9 +1040,20 @@
 
     <!-- ─── PAGE: DB2 (Próximo Mês) ─── -->
     <div class="page" id="page-db2">
-      <div class="section-header">
+      <div class="section-header" style="position:relative;">
         <h2 id="section-title-db2">Próximo Mês</h2>
         <span class="count" id="section-count-db2">0</span>
+        <div class="filter-group">
+          <button class="filter-btn" id="sort-btn-db2" onclick="toggleSort('db2')" title="Ordenar por data">📅 Organizar</button>
+          <div style="position:relative;">
+            <button class="filter-btn" id="filter-tipo-btn-db2" onclick="toggleDropdown('tipo','db2')" title="Filtrar por tipo">🏷️ Tipo</button>
+            <div class="filter-dropdown" id="dropdown-tipo-db2"></div>
+          </div>
+          <div style="position:relative;">
+            <button class="filter-btn" id="filter-inst-btn-db2" onclick="toggleDropdown('inst','db2')" title="Filtrar por instrutor">👤 Instrutor</button>
+            <div class="filter-dropdown" id="dropdown-inst-db2"></div>
+          </div>
+        </div>
         <span class="last-sync" id="last-sync-db2">—</span>
       </div>
       <div id="content-db2" style="min-height:200px;">
@@ -1657,10 +1706,80 @@ function atualizarLabels() {
   }
 }
 
+// ═════════════════════════════════════════════════════════
+//  Filter state
+// ═════════════════════════════════════════════════════════
+let filterState = { db1: { sort: 'asc', tipo: '', inst: '' }, db2: { sort: 'asc', tipo: '', inst: '' } };
+
+function getFilterState() {
+  const key = abaAtiva === 'db1' ? 'db1' : 'db2';
+  return filterState[key];
+}
+
+function toggleSort(db) {
+  const st = filterState[db];
+  st.sort = st.sort === 'asc' ? 'desc' : 'asc';
+  const btn = $('sort-btn-' + db);
+  if (btn) btn.textContent = '📅 ' + (st.sort === 'asc' ? '↑' : '↓') + ' Organizar';
+  if (abaAtiva === 'db' + (db === 'db1' ? '1' : '2')) renderizar();
+}
+
+function toggleDropdown(type, db) {
+  const dd = $('dropdown-' + type + '-' + db);
+  if (!dd) return;
+  const open = dd.classList.contains('open');
+  document.querySelectorAll('.filter-dropdown.open').forEach(el => el.classList.remove('open'));
+  if (!open) {
+    const dados = db === 'db1' ? DB1 : DB2;
+    const st = filterState[db];
+    if (type === 'tipo') {
+      const tipos = [...new Set(dados.map(a => (a.tipo || 'OUTROS').trim()).filter(Boolean))].sort();
+      dd.innerHTML = `<button class="filter-dropdown-item ${!st.tipo ? 'active' : ''}" onclick="setFilter('${db}','tipo','')">Todos (${dados.length})</button>` +
+        tipos.map(t => {
+          const c = dados.filter(a => (a.tipo || '').trim() === t).length;
+          return `<button class="filter-dropdown-item ${st.tipo === t ? 'active' : ''}" onclick="setFilter('${db}','tipo','${escAttr(t)}')">${esc(t)} (${c})</button>`;
+        }).join('');
+    } else {
+      const instrutores = [...new Set(dados.flatMap(a => (a.instrutores || '').split(',').map(i => i.trim()).filter(Boolean)))].sort();
+      dd.innerHTML = `<button class="filter-dropdown-item ${!st.inst ? 'active' : ''}" onclick="setFilter('${db}','inst','')">Todos (${dados.length})</button>` +
+        instrutores.map(i => {
+          const c = dados.filter(a => (a.instrutores || '').split(',').map(s => s.trim()).includes(i)).length;
+          return `<button class="filter-dropdown-item ${st.inst === i ? 'active' : ''}" onclick="setFilter('${db}','inst','${escAttr(i)}')">${esc(i)} (${c})</button>`;
+        }).join('');
+    }
+    dd.classList.add('open');
+  }
+}
+
+function setFilter(db, type, value) {
+  filterState[db][type] = value;
+  document.querySelectorAll('.filter-dropdown.open').forEach(el => el.classList.remove('open'));
+  const st = filterState[db];
+  const tipoBtn = $('filter-tipo-btn-' + db);
+  const instBtn = $('filter-inst-btn-' + db);
+  if (tipoBtn) tipoBtn.innerHTML = '🏷️ Tipo' + (st.tipo ? '<span class="badge">1</span>' : '');
+  if (instBtn) instBtn.innerHTML = '👤 Instrutor' + (st.inst ? '<span class="badge">1</span>' : '');
+  if (abaAtiva === 'db' + (db === 'db1' ? '1' : '2')) renderizar();
+}
+
+function escAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function renderizar() {
   const isDb1 = abaAtiva === 'db1';
+  const key = abaAtiva === 'db1' ? 'db1' : 'db2';
+  const st = filterState[key];
   const total = isDb1 ? DB1.length : DB2.length;
-  const dados = (isDb1 ? DB1 : DB2).filter(item => matchesSearch(item, searchTerm));
+  let dados = (isDb1 ? DB1 : DB2).filter(item => matchesSearch(item, searchTerm));
+  if (st.tipo) dados = dados.filter(a => (a.tipo || '').trim() === st.tipo);
+  if (st.inst) dados = dados.filter(a => (a.instrutores || '').split(',').map(s => s.trim()).includes(st.inst));
+  dados.sort((a, b) => {
+    const da = a.data || '';
+    const db = b.data || '';
+    const cmp = da.localeCompare(db);
+    return st.sort === 'asc' ? cmp : -cmp;
+  });
   atualizarLabels();
   const countEl = isDb1 ? $('section-count') : $('section-count-db2');
   if (countEl) {
@@ -1896,7 +2015,7 @@ function navegar(page) {
   if (page === 'home') renderDashboard();
   else if (page === 'hoje') renderHoje();
   else if (page === 'amanha') renderAmanha();
-  else if (page === 'db1' || page === 'db2') { abaAtiva = page; renderizar(); }
+  else if (page === 'db1' || page === 'db2') { abaAtiva = page; document.querySelectorAll('.filter-dropdown.open').forEach(el => el.classList.remove('open')); renderizar(); }
   else if (page === 'novasatividades') renderNovasAtividades();
   else if (page === 'instrutores') renderInstrutores();
 
@@ -3771,6 +3890,9 @@ document.addEventListener('click', function(e) {
   const boxNome = $('inst-sugestoes-nome');
   if (boxNome && !e.target.closest('#inst-nome') && !e.target.closest('#inst-sugestoes-nome')) {
     boxNome.style.display = 'none';
+  }
+  if (!e.target.closest('.filter-group')) {
+    document.querySelectorAll('.filter-dropdown.open').forEach(el => el.classList.remove('open'));
   }
 });
 
