@@ -127,12 +127,20 @@
     width: 44px; height: 44px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; overflow: hidden; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    background: none;
     box-shadow: 0 0 20px var(--accent-glow);
-    transition: filter 0.3s, transform 0.3s, left 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, left 0.3s, box-shadow 0.3s;
   }
-  #floating-orb:hover { filter: brightness(1.15); transform: scale(1.08); box-shadow: 0 0 30px var(--accent-glow); }
-  #floating-orb img { width: 26px; height: 26px; display: block; margin-left: -3px; }
+  #floating-orb::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    filter: brightness(0.7) saturate(1.3);
+    transition: filter 0.3s;
+  }
+  #floating-orb:hover { transform: scale(1.08); box-shadow: 0 0 30px var(--accent-glow); }
+  #floating-orb:hover::before { filter: brightness(0.9) saturate(1.3); }
+  #floating-orb img { width: 26px; height: 26px; display: block; margin-left: -3px; position: relative; }
 
   .sidebar-header-name {
     position: absolute; top: 14px; left: 62px;
@@ -174,12 +182,15 @@
   }
   .sidebar-footer .nav-item { margin: 2px 0; }
 
+
+
   #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg2); }
 
   #topbar {
     display: flex; align-items: center; gap: 12px; padding: 0 20px;
     background: var(--bg2);
     flex-shrink: 0; height: var(--topbar-h);
+    position: relative;
   }
 
 
@@ -270,18 +281,6 @@
   .last-sync {
     margin-left: auto; font-size: 11px; color: var(--text3);
   }
-
-  .sort-group { display: flex; gap: 4px; align-items: center; }
-  .sort-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--bg3); color: var(--text2); font-family: 'DM Sans', sans-serif;
-    font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .sort-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .sort-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
-  .sort-arrow { font-size: 9px; }
 
 .cards {
   display: grid;
@@ -395,7 +394,7 @@
   .instrutor-avatar.AGENTE { background: rgba(59,130,246,0.15); color: var(--blue); }
   .instrutor-info { flex: 1; min-width: 0; }
   .instrutor-nome { font-weight: 600; font-size: 14px; }
-  .instrutor-nickname { font-size: 11px; color: var(--text3); }
+  .instrutor-apelido { font-size: 11px; color: var(--text3); }
   .instrutor-meta { font-size: 11px; color: var(--text3); margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
   .instrutor-meta span { display: flex; align-items: center; gap: 4px; }
   .instrutor-tag {
@@ -463,23 +462,15 @@
     display: inline-block; padding: 2px 8px; border-radius: 4px; background: var(--bg3);
   }
 
-  .rem-section {
-    margin-top: 14px; padding: 14px; background: var(--bg3); border-radius: 10px;
-    border: 1px solid var(--border); display: none;
-  }
-  .rem-section.open { display: block; }
-  .rem-section .rem-title {
-    font-size: 11px; font-weight: 700; color: var(--yellow); margin-bottom: 10px;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .rem-section input {
+  .modal-input {
     width: 100%; padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--bg2); color: var(--text); font-size: 13px; margin-bottom: 8px;
-    font-family: 'DM Sans', sans-serif;
+    background: var(--bg2); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif;
   }
-  .rem-section input:focus { outline: none; border-color: var(--accent); }
-  .rem-section input::placeholder { color: var(--text3); }
-  .rem-section input:last-child { margin-bottom: 0; }
+  .modal-input:focus { outline: none; border-color: var(--accent); }
+
+  .chip.selected {
+    background: var(--accent); color: #fff; font-weight: 600;
+  }
 
   .modal-footer {
     display: flex; gap: 8px; padding: 14px 22px 18px; flex-wrap: wrap; align-items: center;
@@ -722,9 +713,7 @@
   .status-btn.active-rem { background: rgba(249,115,22,0.2); border-color: var(--orange); color: var(--orange); }
   .status-btn.active-canc { background: rgba(239,68,68,0.2); border-color: var(--red); color: var(--red); }
 
-  .remark-fields { display: none; flex-direction: column; gap: 12px; padding: 14px; background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); border-radius: 10px; }
-  .remark-fields.visible { display: flex; }
-  .remark-label { font-size: 11px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  /* remark-fields removed — editing inline now */
 
   /* ─── CALENDAR ─── */
   .cal-tab { padding: 3px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; color: var(--text2); transition: all 0.15s; }
@@ -753,10 +742,10 @@
 
   /* ─── BTN ─── */
   .btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: var(--accent2); box-shadow: 0 0 16px var(--accent-glow); }
-  .btn-secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: var(--bg2); color: var(--text); }
+  .btn-primary { background: var(--accent); color: white; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: opacity .2s, box-shadow .2s; }
+  .btn-primary:hover { background: var(--accent2); box-shadow: 0 0 16px var(--accent-glow); opacity: .9; }
+  .btn-secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); padding: 10px 22px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: opacity .2s; }
+  .btn-secondary:hover { background: var(--bg2); color: var(--text); opacity: .9; }
   .btn-ghost { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
   .btn-download { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: white; border: none; gap: 6px; box-shadow: 0 2px 12px var(--accent-glow); text-decoration: none; display: inline-flex; align-items: center; }
@@ -884,7 +873,7 @@
         <span class="nav-label">Amanhã</span>
         <span class="nav-badge" id="badge-amanha">0</span>
       </div>
-    <div class="nav-group-label">Agendas</div>
+    <div class="nav-group-label">Agenda</div>
       <div class="nav-item" data-page="db1" onclick="navegar('db1')" id="nav-db1">
         <span class="nav-icon">📅</span>
         <span class="nav-label" id="nav-label-db1">Mês Atual</span>
@@ -917,7 +906,7 @@
       </div>
   </div>
   <div class="sidebar-footer">
-    <div class="nav-item" onclick="carregar('sync')">
+    <div class="nav-item" onclick="carregar()">
       <span class="nav-icon">🔄</span>
       <span>Sincronizar</span>
     </div>
@@ -937,7 +926,6 @@
     </div>
     <div class="topbar-actions">
       <div class="topbar-actions-desktop" style="display:flex;align-items:center;gap:8px;">
-        <a class="dl-btn" id="dl-btn" href="#" target="_blank" download style="display:none">⬇️ Baixar Agenda</a>
         <button class="theme-btn" onclick="abrirThemePicker()" title="Personalizar tema" id="theme-picker-btn">🎨</button>
         <span class="topbar-sep"></span>
         <button class="access-btn" onclick="cycleFontSize(-1)" title="Diminuir fonte">A<sup style="font-size:9px;">−</sup></button>
@@ -953,8 +941,7 @@
         <button class="overflow-menu-item" onclick="cycleFontSize(1)">A+ Aumentar fonte</button>
         <button class="overflow-menu-item" onclick="toggleContrast()" id="overflow-contrast-btn">◐ Alto contraste</button>
         <div class="overflow-sep"></div>
-        <button class="overflow-menu-item" onclick="carregar('sync')">🔄 Sincronizar</button>
-        <a class="overflow-menu-item" id="overflow-dl" href="#" target="_blank" download style="text-decoration:none;">⬇️ Baixar PDF</a>
+        <button class="overflow-menu-item" onclick="carregar()">🔄 Sincronizar</button>
         <button class="overflow-menu-item" onclick="navegar('config')">⚙️ Config</button>
         <button class="overflow-menu-item" onclick="navegar('sobre')">ℹ️ Sobre</button>
       </div>
@@ -1002,11 +989,6 @@
     <div class="page" id="page-db1">
       <div class="section-header">
         <h2 id="section-title">Mês Atual</h2>
-        <div class="sort-group" id="sort-group-db1">
-          <span class="sort-btn" data-field="data" onclick="setSort('data')" title="Ordenar por data">📅 DATA <span class="sort-arrow">▲</span></span>
-          <span class="sort-btn" data-field="instrutor" onclick="setSort('instrutor')" title="Ordenar por instrutor">👨‍🏫 AGENTE/INSTRUTOR <span class="sort-arrow">▲</span></span>
-          <span class="sort-btn" data-field="tipo" onclick="setSort('tipo')" title="Ordenar por tipo">✔️ TIPO <span class="sort-arrow">▲</span></span>
-        </div>
         <span class="count" id="section-count">0</span>
         <span class="last-sync" id="last-sync-db1">—</span>
       </div>
@@ -1022,11 +1004,6 @@
     <div class="page" id="page-db2">
       <div class="section-header">
         <h2 id="section-title-db2">Próximo Mês</h2>
-        <div class="sort-group" id="sort-group-db2">
-          <span class="sort-btn" data-field="data" onclick="setSort('data')" title="Ordenar por data">📅 DATA <span class="sort-arrow">▲</span></span>
-          <span class="sort-btn" data-field="instrutor" onclick="setSort('instrutor')" title="Ordenar por instrutor">👨‍🏫 AGENTE/INSTRUTOR <span class="sort-arrow">▲</span></span>
-          <span class="sort-btn" data-field="tipo" onclick="setSort('tipo')" title="Ordenar por tipo">✔️ TIPO <span class="sort-arrow">▲</span></span>
-        </div>
         <span class="count" id="section-count-db2">0</span>
         <span class="last-sync" id="last-sync-db2">—</span>
       </div>
@@ -1051,7 +1028,7 @@
             </div>
             <div class="field-group">
               <label class="field-label">Nome da Atividade *</label>
-              <input class="field-input" id="naf-nome" placeholder="Ex: Excel - Módulo I">
+              <input class="field-input" id="naf-nome" placeholder="Ex: Excel - Módulo I" oninput="atualizarCodigoPreview()">
             </div>
             <div class="field-group">
               <label class="field-label">Tipo *</label>
@@ -1062,13 +1039,13 @@
                 <div class="chip" onclick="selNAFChip('naf-tipo','EVENTO')">EVENTO</div>
                 <div class="chip" onclick="selNAFChip('naf-tipo','WORKSHOP')">WORKSHOP</div>
               </div>
-              <input class="field-input" id="naf-tipo" placeholder="Selecione ou digite" style="margin-top:8px;">
+              <input class="field-input" id="naf-tipo" placeholder="Selecione ou digite" style="margin-top:8px;" oninput="atualizarCodigoPreview()">
             </div>
             <div class="field-group">
               <label class="field-label">Data *</label>
               <div style="position:relative;">
                 <input class="field-input" id="naf-data" placeholder="DD/MM/AAAA" autocomplete="off" readonly
-                  onclick="toggleNAFCal()" style="cursor:pointer;padding-right:36px;">
+                  onclick="toggleNAFCal();setTimeout(atualizarCodigoPreview,100)" style="cursor:pointer;padding-right:36px;">
                 <span onclick="toggleNAFCal()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text3);">📅</span>
                 <div id="naf-cal" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:2000;
                   background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;
@@ -1108,13 +1085,12 @@
             <div class="field-group">
               <label class="field-label">Instrutores / Agentes</label>
               <div class="field-chips" id="naf-inst-chips"></div>
-              <input class="field-input" id="naf-instrutores" placeholder="Selecione ou digite" style="margin-top:8px;">
+              <input class="field-input" id="naf-instrutores" placeholder="Selecione ou digite" style="margin-top:8px;" oninput="atualizarCodigoPreview()">
             </div>
             <div class="field-group">
               <label class="field-label">Local</label>
               <div class="field-chips" style="margin-bottom:8px;">
                 <div class="chip" onclick="selNAFChip('naf-local','SALA I')">SALA I</div>
-                <div class="chip" onclick="selNAFChip('naf-local','SALA II')">SALA II</div>
                 <div class="chip" onclick="selNAFChip('naf-local','LAN TABLE')">LAN TABLE</div>
                 <div class="chip" onclick="selNAFChip('naf-local','SALA GAMER')">SALA GAMER</div>
               </div>
@@ -1124,9 +1100,13 @@
               <label class="field-label">Público Alvo</label>
               <input class="field-input" id="naf-publicoAlvo" placeholder="Ex: GERAL, MELHOR IDADE">
             </div>
+            <div class="field-group" style="margin-top:4px;">
+              <label class="field-label">Código da Turma (gerado automaticamente)</label>
+              <input class="field-input" id="naf-codigo" readonly style="background:var(--bg3);color:var(--accent);font-family:monospace;font-size:14px;letter-spacing:1px;">
+            </div>
             <div id="naf-error" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px;font-size:12px;color:#f87171;"></div>
             <div style="display:flex;gap:8px;margin-top:16px;">
-              <button class="btn btn-primary" onclick="salvarNovaAtividade()">Salvar Atividade</button>
+              <button class="btn-primary" onclick="salvarNovaAtividade()">Salvar Atividade</button>
               <button class="btn-secondary" onclick="limparNAForm()">Limpar</button>
             </div>
           </div>
@@ -1154,8 +1134,8 @@
           <div class="config-row-value">
             <select class="field-input" id="config-sidebar-mode" onchange="setConfig('sidebarMode',this.value)" style="width:auto;">
               <option value="expanded">Expandida</option>
-              <option value="collapsed">Recolhida</option>
-              <option value="pinned">Fixada</option>
+              <option value="collapsed">Colapsada</option>
+              <option value="hidden">Oculta</option>
             </select>
           </div>
         </div>
@@ -1200,17 +1180,9 @@
             </label>
           </div>
         </div>
-        <div class="config-title" style="margin-top:24px;">Planilha</div>
+        <div class="config-title" style="margin-top:24px;">Planilha de Planejamento</div>
         <div class="config-row">
-          <span class="config-row-label">Google Sheets ID</span>
-          <div class="config-row-value" id="config-sheet-id" style="font-size:12px;color:var(--text3);word-break:break-all;"></div>
-        </div>
-        <div class="config-row">
-          <a class="config-link" id="config-sheet-link" href="#" target="_blank">📂 Abrir planilha →</a>
-        </div>
-        <div class="config-title" style="margin-top:24px;">Base de Dados Original</div>
-        <div class="config-row">
-          <span class="config-row-label">URL da planilha de planejamento</span>
+          <span class="config-row-label">URL da planilha de planejamento (config!B2)</span>
           <div class="config-row-value" style="flex-direction:column;gap:8px;align-items:stretch;">
             <input class="field-input" id="config-base-url" placeholder="Carregando..." style="font-size:12px;word-break:break-all;">
             <div style="display:flex;gap:8px;">
@@ -1259,14 +1231,14 @@
             <div class="field-group">
               <label class="field-label">Nome completo *</label>
               <div style="position:relative;">
-                <input class="field-input" id="inst-nome" placeholder="Ex: Diego Silva" autocomplete="off" oninput="sugerirNicknamePorNome(this.value)">
+                <input class="field-input" id="inst-nome" placeholder="Ex: Diego Silva" autocomplete="off" oninput="sugerirApelidoPorNome(this.value)">
                 <div id="inst-sugestoes-nome" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg3);border:1px solid var(--border);border-radius:8px;z-index:100;max-height:160px;overflow-y:auto;"></div>
               </div>
             </div>
             <div class="field-group">
-              <label class="field-label">Nickname <span style="color:var(--text3);font-weight:400;text-transform:none;">(sugere nomes do planejamento)</span></label>
+              <label class="field-label">Apelido / Nickname <span style="color:var(--text3);font-weight:400;text-transform:none;">(sugere nomes do planejamento)</span></label>
               <div style="position:relative;">
-                <input class="field-input" id="inst-nickname" placeholder="Ex: DIEGO" autocomplete="off" oninput="sugerirNickname(this.value)">
+                <input class="field-input" id="inst-apelido" placeholder="Ex: DIEGO" autocomplete="off" oninput="sugerirApelido(this.value)">
                 <div id="inst-sugestoes" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg3);border:1px solid var(--border);border-radius:8px;z-index:100;max-height:160px;overflow-y:auto;"></div>
               </div>
             </div>
@@ -1278,13 +1250,9 @@
               </div>
               <input class="field-input" id="inst-tipo" placeholder="Selecione o tipo" style="margin-top:8px;" readonly>
             </div>
-            <div class="field-group" style="flex-direction:row;align-items:center;gap:10px;">
-              <label class="field-label" style="margin-bottom:0;">Administrador</label>
-              <input type="checkbox" id="inst-admin" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
-            </div>
             <div class="field-group">
               <label class="field-label">Data de Nascimento</label>
-              <input class="field-input" id="inst-nascimento" placeholder="dd/mm/aaaa" autocomplete="off" oninput="mascararData(this);calcularIdade()" maxlength="10">
+              <input class="field-input" id="inst-nascimento" type="date" onchange="calcularIdade()">
             </div>
             <div class="field-group">
               <label class="field-label">Idade</label>
@@ -1380,9 +1348,44 @@
 // ═════════════════════════════════════════════════════════
 //  CONFIG
 // ═════════════════════════════════════════════════════════
-const API_KEY = 'AIzaSyBosXCsUFunHr02JHXUVAh1jypyhZrNGXg';
-const SHEET_ID = '18dOTG1kjP-xfKQa1FbtBn-WbAZg3NYwXU2dDaELB7n0';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYs2qEl0ZvD5YnxD6tUTdDNp_D8xRMaB-KTPgYNgFkEgvi7U5SnjIqewMJuRvpx73hmA/exec';
+const DRIVE_API_KEY = 'AIzaSyB5IsYlQpzLd6YZO_Zk5O9YV5jrss1CP60';
+const SNAPS_FOLDER_ID = '18ynJteC2nvWI3AlIjaGqUEWd29jBF1eg';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmULN5T_fgtFFcAUwN_k2yt8IzF89L-f7Zc3URMn_wMni8irZDqMp41BvjytmcUcKSgA/exec';
+
+// ═════════════════════════════════════════════════════════
+//  JSONP helper (contorna CORS do Apps Script)
+// ═════════════════════════════════════════════════════════
+function fetchJSONP(params) {
+  return new Promise(function(resolve, reject) {
+    var cb = 'jpcb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    window[cb] = function(data) {
+      delete window[cb];
+      var el = document.getElementById('_js_' + cb);
+      if (el) el.remove();
+      resolve(data);
+    };
+    var url = SCRIPT_URL + '?callback=' + cb;
+    for (var k in params) {
+      url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(params[k] || ''));
+    }
+    var s = document.createElement('script');
+    s.id = '_js_' + cb;
+    s.src = url;
+    s.onerror = function() {
+      delete window[cb];
+      if (s.parentNode) s.remove();
+      reject(new Error('Erro de rede ao chamar API'));
+    };
+    document.body.appendChild(s);
+    setTimeout(function() {
+      if (window[cb]) {
+        delete window[cb];
+        if (s.parentNode) s.remove();
+        reject(new Error('Timeout na requisição'));
+      }
+    }, 15000);
+  });
+}
 
 // ═════════════════════════════════════════════════════════
 //  STATE
@@ -1395,8 +1398,6 @@ let statusSel = 'CONFIRMADA';
 let searchTerm = '';
 let searchTimeout = null;
 let syncTimer = null;
-let sortState = { field: 'data', order: 'asc' };
-let sortInitialized = false;
 
 function $(id) { return document.getElementById(id); }
 
@@ -1485,230 +1486,146 @@ function fecharSidebar() {
 // ═════════════════════════════════════════════════════════
 //  CARREGAR DADOS
 // ═════════════════════════════════════════════════════════
-async function carregar(modo) {
-  console.log('[carregar] modo:', modo);
+async function carregar() {
+  console.log('[carregar] INICIANDO...');
   try {
-    if (modo === 'sync') {
-      // Gera snapshot em background sem descarregar a interface
-      try {
-        await fetch(`${SCRIPT_URL}?action=syncFull`);
-      } catch (e) {
-        console.warn('[carregar] erro ao gerar snapshot:', e);
-      }
-      // Recarrega do snapshot recem-criado
-      const ok = await carregarDeSnapshot();
-      if (ok) { await afterLoad(); return; }
-      // fallback se snapshot falhar
-      await carregarDasPlanilhas();
-      await afterLoad();
-      return;
-    }
-
-    if (modo !== 'sheets') {
-      const ok = await carregarDeSnapshot();
-      if (ok) { await afterLoad(); return; }
-    }
-
-    const loadingMsg = `<div class="empty-state"><div class="empty-icon">📡</div><span>Carregando...</span></div>`;
+    const loadingMsg = `<div class="empty-state"><div class="empty-icon">📡</div><span>Sincronizando...</span></div>`;
     const contentEl = $('content');
     if (contentEl) contentEl.innerHTML = loadingMsg;
     const contentDb2 = $('content-db2');
     if (contentDb2) contentDb2.innerHTML = loadingMsg;
 
-    await carregarDasPlanilhas();
-    await afterLoad();
+    // 1. Listar arquivos na pasta
+    var listUrl = 'https://www.googleapis.com/drive/v3/files?q=%27' + SNAPS_FOLDER_ID + '%27+in+parents&key=' + DRIVE_API_KEY + '&fields=files(id,name)';
+    var listRes = await fetch(listUrl);
+    var listData = await listRes.json();
+    var files = listData.files || [];
+
+    var snapFile = files.find(function(f) { return f.name === 'snaps.json'; });
+    if (!snapFile) throw new Error('snaps.json não encontrado na pasta.');
+
+    var customFile = files.find(function(f) { return f.name === 'newclass.json'; });
+
+    // 2. Ler snaps.json
+    var jsonUrl = 'https://www.googleapis.com/drive/v3/files/' + snapFile.id + '?alt=media&key=' + DRIVE_API_KEY;
+    var jsonRes = await fetch(jsonUrl);
+    var snapData = await jsonRes.json();
+    var snapRows = snapData.map(jsonToAula22);
+
+    // 3. Ler newclass.json (se existir)
+    var customRows = [];
+    if (customFile) {
+      var ncUrl = 'https://www.googleapis.com/drive/v3/files/' + customFile.id + '?alt=media&key=' + DRIVE_API_KEY;
+      var ncRes = await fetch(ncUrl);
+      customRows = await ncRes.json();
+    }
+
+    // 4. Merge: newclass sobrescreve snapshot
+    var allRows = mergeJSON(snapRows, customRows);
+
+    // 5. Separar por mês
+    var agora = new Date();
+    var mesAtual = agora.getMonth();
+    var anoAtual = agora.getFullYear();
+    var proxMes = mesAtual === 11 ? 0 : mesAtual + 1;
+    var proxAno = mesAtual === 11 ? anoAtual + 1 : anoAtual;
+
+    DB1 = allRows.filter(function(r) {
+      if (!r.data || !r.data.includes('/')) return false;
+      var parts = r.data.split('/');
+      return parseInt(parts[1]) - 1 === mesAtual && parseInt(parts[2]) === anoAtual;
+    });
+
+    DB2 = allRows.filter(function(r) {
+      if (!r.data || !r.data.includes('/')) return false;
+      var parts = r.data.split('/');
+      return parseInt(parts[1]) - 1 === proxMes && parseInt(parts[2]) === proxAno;
+    });
+
+    // NOVAS_AULAS = custom rows sem match no snapshot
+    var snapKeys = {};
+    snapRows.forEach(function(r) { snapKeys[r.codigo + '|' + r.data] = true; });
+    NOVAS_AULAS = customRows.filter(function(r) {
+      return r.codigo && r.data && !snapKeys[r.codigo + '|' + r.data];
+    });
+
+    var syncTime = 'Última sincronização: ' + new Date().toLocaleTimeString('pt-BR');
+    var ls1 = $('last-sync');
+    var ls2 = $('last-sync-db1');
+    var ls3 = $('last-sync-db2');
+    if (ls1) ls1.textContent = syncTime;
+    if (ls2) ls2.textContent = syncTime;
+    if (ls3) ls3.textContent = syncTime;
+
+    var badgeHoje = $('badge-hoje');
+    var badgeAmanha = $('badge-amanha');
+    if (badgeHoje) badgeHoje.textContent = getAulasPorData(hojeStr()).length;
+    if (badgeAmanha) badgeAmanha.textContent = getAulasPorData(amanhaStr()).length;
+
+    if (currentPage === 'home') renderDashboard();
+    else if (currentPage === 'hoje') renderHoje();
+    else if (currentPage === 'amanha') renderAmanha();
+    else if (currentPage === 'novasatividades') renderNovasAtividades();
+    else renderizar();
+    console.log('[carregar] COMPLETO, total:', allRows.length, 'novas_aulas:', NOVAS_AULAS.length);
   } catch (e) {
     console.error('[carregar] ERRO:', e);
-    const el = $('content') || $('na-list-content');
-    if (el) el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><span>Erro: ${e.message}</span></div>`;
+    var el = $('content') || $('na-list-content');
+    if (el) el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><span>Erro: ' + e.message + '</span></div>';
   }
 }
 
-async function carregarDeSnapshot() {
-  try {
-    const mes = `${String(ANO_ATUAL)}-${String(MES_ATUAL+1).padStart(2,'0')}`;
-    // database1 e database2 são gerados no mesmo snapshot (mesmo timestamp)
-    const [r1, r2] = await Promise.all([
-      fetch(`${SCRIPT_URL}?action=getSnapshotData&aba=database1&mes=${mes}`).then(r=>r.json()),
-      fetch(`${SCRIPT_URL}?action=getSnapshotData&aba=database2&mes=${mes}`).then(r=>r.json()),
-    ]);
-
-    if (!r1.rows || !r1.rows.length) {
-      console.warn('[carregarDeSnapshot] sem snapshot para', mes);
-      return false;
-    }
-
-    DB1 = (r1.rows || []).map((row,i) => rowToAula(row, 0)).filter(Boolean);
-    DB2 = (r2.rows || []).map((row,i) => rowToAula(row, 0)).filter(Boolean);
-
-    console.log('[carregarDeSnapshot] DB1:', DB1.length, 'DB2:', DB2.length);
-    return true;
-  } catch (e) {
-    console.warn('[carregarDeSnapshot] erro, fallback para planilha:', e);
-    return false;
-  }
-}
-
-async function carregarDasPlanilhas() {
-  console.log('[carregarDasPlanilhas] carregando direto da planilha...');
-  const [r1, r2] = await Promise.all([
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/database1!A3:S2000?key=${API_KEY}`).then(r=>r.json()),
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/database2!A3:S2000?key=${API_KEY}`).then(r=>r.json()),
-  ]);
-
-  DB1 = (r1.values || []).map((row,i) => rowToAula(row, i+3)).filter(Boolean);
-  DB2 = (r2.values || []).map((row,i) => rowToAula(row, i+3)).filter(Boolean);
-}
-
-async function afterLoad() {
-  try {
-    const rNA = await fetch(`${SCRIPT_URL}?action=getNovasAtividadesDrive`).then(r=>r.json());
-    if (rNA.ok && Array.isArray(rNA.rows)) NOVAS_AULAS = rNA.rows;
-    else throw new Error('API returned invalid data');
-  } catch (e) {
-    console.warn('[novas_atividades] API erro, fallback p/ JSON:', e);
-    try {
-      const rNA2 = await fetch('novas_atividades.json').then(r=>r.json());
-      NOVAS_AULAS = Array.isArray(rNA2) ? rNA2 : [];
-    } catch (e2) {
-      NOVAS_AULAS = [];
-    }
-  }
-
-  const syncTime = 'Última sincronização: ' + new Date().toLocaleTimeString('pt-BR');
-  const ls1 = $('last-sync');
-  const ls2 = $('last-sync-db1');
-  const ls3 = $('last-sync-db2');
-  if (ls1) ls1.textContent = syncTime;
-  if (ls2) ls2.textContent = syncTime;
-  if (ls3) ls3.textContent = syncTime;
-
-  const badgeHoje = $('badge-hoje');
-  const badgeAmanha = $('badge-amanha');
-  if (badgeHoje) badgeHoje.textContent = getAulasPorData(hojeStr()).length;
-  if (badgeAmanha) badgeAmanha.textContent = getAulasPorData(amanhaStr()).length;
-
-  if (currentPage === 'home') renderDashboard();
-  else if (currentPage === 'hoje') renderHoje();
-  else if (currentPage === 'amanha') renderAmanha();
-  else if (currentPage === 'novasatividades') renderNovasAtividades();
-  else renderizar();
-}
-
-function rowToAula(row, rowNum) {
-  if (!row || !row[0] || String(row[0]).trim() === '') return null;
+// Converte objeto do snaps.json pro formato aula
+function jsonToAula22(obj) {
   return {
-    _row: rowNum,
-    id: String(row[0]||'').trim(),
-    san: String(row[1]||'').trim(),
-    nome: String(row[2]||'').trim(),
-    tipo: String(row[3]||'').trim(),
-    eixo: String(row[4]||'').trim(),
-    vagas: row[5] || 0,
-    parceria: String(row[6]||'').trim(),
-    turmaAberta: String(row[7]||'').trim(),
-    publicoAlvo: String(row[8]||'').trim(),
-    turno: String(row[9]||'').trim(),
-    data: fmtData(row[10]),
-    horario: String(row[11]||'').trim(),
-    instrutores: String(row[12]||'').trim(),
-    local: String(row[13]||'').trim(),
-    status: String(row[14]||'').trim() || 'CONFIRMADA',
-    novaData: fmtData(row[15]) || '',
-    novoHorario: String(row[16]||'').trim() || '',
-    novoInstrutor: String(row[17]||'').trim() || '',
-    novoLocal: String(row[18]||'').trim() || '',
-    horaInicio: row[20] ? fmtHora(row[20]) : '',
-    horaFim: row[21] ? fmtHora(row[21]) : '',
+    id: obj.codigo || '',
+    san: '',
+    nome: obj.nome || '',
+    tipo: obj.tipo || '',
+    eixo: obj.eixoTematico || '',
+    vagas: parseInt(obj.vagas) || 0,
+    parceria: obj.parceria || '',
+    turmaAberta: obj.turmaFechadaAberta || '',
+    publicoAlvo: obj.publicoAlvo || '',
+    turno: (obj.turno || '').toUpperCase(),
+    data: obj.data || '',
+    horario: obj.horario || '',
+    instrutores: obj.instrutor || '',
+    local: obj.local || '',
+    codigo: obj.codigo || '',
+    status: 'CONFIRMADA',
   };
 }
 
-function fmtData(v) {
-  if (!v) return '';
-  if (v instanceof Date) {
-    return String(v.getDate()).padStart(2,'0')+'/'+String(v.getMonth()+1).padStart(2,'0')+'/'+v.getFullYear();
-  }
-  return String(v).trim();
-}
-
-function fmtHora(v) {
-  if (!v) return '';
-  const s = String(v).trim();
-  const parts = s.split(' ');
-  if (parts.length >= 2) return parts[1].slice(0, 5);
-  const m = s.match(/(\d{1,2}):(\d{2})/);
-  return m ? m[1]+':'+m[2] : s;
-}
-
-// ═════════════════════════════════════════════════════════
-//  NOVAS AULAS
-// ═════════════════════════════════════════════════════════
-let NOVAS_AULAS = [];
-
-// ═════════════════════════════════════════════════════════
-//  SORT
-// ═════════════════════════════════════════════════════════
-function initSort() {
-  if (sortInitialized) return;
-  sortInitialized = true;
-  const saved = localStorage.getItem('nave_sort');
-  if (saved) {
-    try { sortState = JSON.parse(saved); } catch(e) {}
-  }
-  updateSortUI();
-}
-
-function setSort(field) {
-  initSort();
-  if (sortState.field === field) {
-    sortState.order = sortState.order === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortState.field = field;
-    sortState.order = 'asc';
-  }
-  localStorage.setItem('nave_sort', JSON.stringify(sortState));
-  updateSortUI();
-  // Re-render current agenda view
-  if (currentPage === 'db1' || currentPage === 'db2') renderizar();
-  else if (currentPage === 'hoje') renderHoje();
-  else if (currentPage === 'amanha') renderAmanha();
-}
-
-function updateSortUI() {
-  document.querySelectorAll('.sort-btn').forEach(btn => {
-    const f = btn.dataset.field;
-    const active = f === sortState.field;
-    btn.classList.toggle('active', active);
-    const arrow = btn.querySelector('.sort-arrow');
-    if (arrow) arrow.textContent = active ? (sortState.order === 'asc' ? '▲' : '▼') : '▲';
+// Merge: newclass.json sobrescreve snaps.json por codigo+data
+function mergeJSON(snapRows, customRows) {
+  var customByKey = {};
+  customRows.forEach(function(r) {
+    if (r.codigo && r.data) customByKey[r.codigo + '|' + r.data] = r;
   });
-}
 
-function sortCards(arr) {
-  if (!arr || !arr.length) return arr;
-  const f = sortState.field;
-  const order = sortState.order;
-  const mult = order === 'asc' ? 1 : -1;
-
-  return [...arr].sort((a, b) => {
-    let va, vb;
-
-    if (f === 'data') {
-      va = parseData(a.data);
-      vb = parseData(b.data);
-    } else if (f === 'instrutor') {
-      va = (a.instrutores || '').toLowerCase();
-      vb = (b.instrutores || '').toLowerCase();
-    } else if (f === 'tipo') {
-      va = (a.tipo || '').toLowerCase();
-      vb = (b.tipo || '').toLowerCase();
+  var merged = snapRows.map(function(snap) {
+    var key = snap.codigo + '|' + snap.data;
+    if (customByKey[key]) {
+      var cust = customByKey[key];
+      cust._isCustom = true;
+      delete customByKey[key];
+      return Object.assign({}, snap, cust);
     }
-
-    if (va < vb) return -1 * mult;
-    if (va > vb) return 1 * mult;
-    return 0;
+    return snap;
   });
+
+  Object.keys(customByKey).forEach(function(k) {
+    var cust = customByKey[k];
+    cust._isCustom = true;
+    if (cust.nome || cust.codigo) merged.push(cust);
+  });
+
+  return merged;
 }
+
+// NOVAS AULAS
+let NOVAS_AULAS = [];
 
 // ═════════════════════════════════════════════════════════
 //  RENDER
@@ -1726,7 +1643,6 @@ const PROX_MES = MES_ATUAL === 11 ? 0 : MES_ATUAL + 1;
 const PROX_ANO = MES_ATUAL === 11 ? ANO_ATUAL + 1 : ANO_ATUAL;
 const LABEL_DB1 = MESES[MES_ATUAL] + ' ' + ANO_ATUAL;
 const LABEL_DB2 = MESES[PROX_MES] + ' ' + PROX_ANO;
-const DL_GIDS = { db1:'269620367', db2:'880983102' };
 
 function atualizarLabels() {
   $('nav-label-db1').textContent = LABEL_DB1;
@@ -1739,64 +1655,17 @@ function atualizarLabels() {
     if (currentPage === 'db1') $('topbar-title').textContent = LABEL_DB1;
     else $('topbar-title').textContent = LABEL_DB2;
   }
-  atualizarDownloadBtn();
-}
-
-function atualizarDownloadBtn() {
-  const el = $('dl-btn');
-  const gid = DL_GIDS[abaAtiva];
-  const label = abaAtiva === 'db1' ? LABEL_DB1 : LABEL_DB2;
-  el.href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=pdf&gid=${gid}&scale=3&portrait=false&fzc=true&pagenum=CENTER`;
-  el.innerHTML = `⬇️ Baixar Agenda · ${label}`;
-}
-
-function getNAMonth(na) {
-  if (!na || !na.data) return -1;
-  const p = na.data.split('/');
-  if (p.length !== 3) return -1;
-  return parseInt(p[1]) - 1;
-}
-
-function naToCard(na) {
-  return {
-    id: 'na_' + (na.id || Math.random().toString(36).slice(2, 8)),
-    san: na.eixo || '',
-    nome: na.nome || '',
-    tipo: na.tipo || '',
-    eixo: na.eixo || '',
-    data: na.data,
-    horario: na.horario || '',
-    instrutores: na.instrutores || '',
-    local: na.local || '',
-    turmaAberta: na.turmaAberta || '',
-    parceria: na.parceria || '',
-    publicoAlvo: na.publicoAlvo || '',
-    status: 'CONFIRMADA',
-    _na: true,
-  };
 }
 
 function renderizar() {
-  initSort();
   const isDb1 = abaAtiva === 'db1';
-  const targetMonth = isDb1 ? MES_ATUAL : PROX_MES;
-  const targetYear = isDb1 ? ANO_ATUAL : PROX_ANO;
-  const src = isDb1 ? DB1 : DB2;
-  let dados = src.filter(item => matchesSearch(item, searchTerm));
-  // Add novas atividades that belong to this month
-  (NOVAS_AULAS || []).forEach(na => {
-    if (getNAMonth(na) === targetMonth && na.data && na.data.includes('/' + String(targetYear))) {
-      const card = naToCard(na);
-      if (matchesSearch(card, searchTerm)) dados.push(card);
-    }
-  });
-  const totalBase = isDb1 ? DB1.length : DB2.length;
-  dados = sortCards(dados);
+  const total = isDb1 ? DB1.length : DB2.length;
+  const dados = (isDb1 ? DB1 : DB2).filter(item => matchesSearch(item, searchTerm));
   atualizarLabels();
   const countEl = isDb1 ? $('section-count') : $('section-count-db2');
   if (countEl) {
     countEl.textContent = dados.length;
-    countEl.title = totalBase ? dados.length + ' (' + totalBase + ' da planilha)' : '';
+    countEl.title = dados.length === total ? '' : dados.length + ' de ' + total;
   }
   const badge1 = $('badge1');
   const badge2 = $('badge2');
@@ -1810,6 +1679,7 @@ function renderizar() {
     return;
   }
 
+  const dbKey = abaAtiva;
   let html = '<div class="cards">';
   dados.forEach((item, i) => {
     const s = item.status || 'CONFIRMADA';
@@ -1822,13 +1692,8 @@ function renderizar() {
     if (item.instrutores) meta.push(`<span class="card-meta-item"><span class="ico">👤</span>${item.instrutores}</span>`);
     if (item.eixo) meta.push(`<span class="card-meta-item"><span class="ico">🏷️</span>${item.eixo}</span>`);
 
-    const onclick = item._na
-      ? `navegar('novasatividades')`
-      : `abrirModal('${abaAtiva}',${src.indexOf(item)})`;
-    const extraClass = item._na ? ' card-na' : '';
-
     html += `
-      <div class="card status-${s} tipo-${tipoClass}${extraClass}" onclick="${onclick}">
+      <div class="card status-${s} tipo-${tipoClass}" onclick="abrirModal('${dbKey}',${i})">
         <div class="card-top">
           <span class="card-san">${item.san || item.id || ''}</span>
           <span class="card-tipo">${item.tipo || '—'}</span>
@@ -1857,39 +1722,41 @@ function abrirModal(db, idx) {
 
   $('modal-title').textContent = item.nome || 'Editar';
 
-  const campos = [
-    ['Código', item.id], ['Turma', item.san], ['Nome', item.nome],
-    ['Tipo', item.tipo], ['Eixo', item.eixo], ['Vagas', item.vagas],
-    ['Parceria', item.parceria], ['Turma', item.turmaAberta],
-    ['Público', item.publicoAlvo], ['Turno', item.turno],
-    ['Data', item.data], ['Horário', item.horario],
-    ['Instrutores', item.instrutores], ['Local', item.local],
-  ];
+  var dataVal = item.data || '';
+  var dataParts = dataVal.split('/');
+  var dataISO = dataParts.length === 3 ? dataParts[2]+'-'+dataParts[1]+'-'+dataParts[0] : '';
 
-  let body = campos.map(([l,v]) =>
-    `<div class="field"><label>${l}</label><div class="val">${v || '<span style="color:var(--text3)">—</span>'}</div></div>`
-  ).join('');
-
-  body += `<div class="field"><label>Status</label><div class="val" id="modal-status">${item.status || 'CONFIRMADA'}</div></div>`;
-
-  const novaData = item.novaData || '';
-  const dataParts = novaData.split('/');
-  const dataISO = dataParts.length === 3 ? dataParts[2]+'-'+dataParts[1]+'-'+dataParts[0] : '';
-  body += `
-    <div class="rem-section" id="rem-section">
-      <div class="rem-title">🔄 Dados da Remarcação</div>
-      <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:2px;">Nova Data</label>
-      <input id="f-nova-data" type="date" value="${escapeHtml(dataISO)}">
-      <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:2px;margin-top:8px;">Novo Horário</label>
-      ${optChipsHtml(['09h às 12h','14h às 17h','18h às 21h'], item.novoHorario || '', 'f-novo-horario')}
-      <input id="f-novo-horario" placeholder="Selecione" value="${escapeHtml(item.novoHorario || '')}" style="display:none;">
-      <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;margin-top:8px;">Novo Instrutor</label>
-      ${instChipsHtml(item.novoInstrutor || '', 'f-novo-instrutor', false)}
-      <input id="f-novo-instrutor" type="hidden" value="${escapeHtml(item.novoInstrutor || '')}">
-      <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:2px;margin-top:8px;">Novo Local</label>
-      ${optChipsHtml(['SALA I','LAN TABLE'], item.novoLocal || '', 'f-novo-local')}
-      <input id="f-novo-local" placeholder="Selecione" value="${escapeHtml(item.novoLocal || '')}" style="display:none;">
-    </div>`;
+  let body = `
+    <div class="field"><label>Código</label><div class="val">${escapeHtml(item.id || '—')}</div></div>
+    <div class="field"><label>Turma</label><div class="val">${escapeHtml(item.san || '—')}</div></div>
+    <div class="field"><label>Nome</label><div class="val">${escapeHtml(item.nome || '—')}</div></div>
+    <div class="field"><label>Tipo</label><div class="val">${escapeHtml(item.tipo || '—')}</div></div>
+    <div class="field"><label>Eixo</label><div class="val">${escapeHtml(item.eixo || '—')}</div></div>
+    <div class="field"><label>Vagas</label><div class="val">${item.vagas || '—'}</div></div>
+    <div class="field"><label>Parceria</label><div class="val">${escapeHtml(item.parceria || '—')}</div></div>
+    <div class="field"><label>Turma</label><div class="val">${escapeHtml(item.turmaAberta || '—')}</div></div>
+    <div class="field"><label>Público</label><div class="val">${escapeHtml(item.publicoAlvo || '—')}</div></div>
+    <div class="field"><label>Turno</label><div class="val">${escapeHtml(item.turno || '—')}</div></div>
+    <div class="field"><label>Data</label><div class="val">${escapeHtml(dataVal || '—')}</div></div>
+    <div class="field"><label>Horário</label>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1">
+        ${['09h às 12h','14h às 17h','18h às 21h'].map(h =>
+          `<span class="chip ${(item.horario||'').trim()===h?'selected-'+statusSel:''}" onclick="selChip(this,'f-horario')">${h}</span>`
+        ).join('')}
+        <input id="f-horario" class="modal-input" value="${escapeHtml(item.horario || '')}" placeholder="Ou digite" style="flex:1;min-width:120px;">
+      </div>
+    </div>
+    <div class="field"><label>Instrutor</label>${instChipsHtml(item.instrutores || '', 'f-instrutores', true)}
+      <input id="f-instrutores" class="modal-input" value="${escapeHtml(item.instrutores || '')}"></div>
+    <div class="field"><label>Local</label>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1">
+        ${['SALA I','LAN TABLE'].map(l =>
+          `<span class="chip ${(item.local||'').trim()===l?'selected-'+statusSel:''}" onclick="selChip(this,'f-local')">${l}</span>`
+        ).join('')}
+        <input id="f-local" class="modal-input" value="${escapeHtml(item.local || '')}" placeholder="Ou digite" style="flex:1;min-width:120px;">
+      </div>
+    </div>
+    <div class="field"><label>Status</label><div class="val" id="modal-status">${item.status || 'CONFIRMADA'}</div></div>`;
 
   $('modal-body').innerHTML = body;
 
@@ -1899,9 +1766,15 @@ function abrirModal(db, idx) {
   document.querySelectorAll('.status-btn').forEach(b => {
     if (b.classList.contains(map[statusSel])) b.classList.add('active');
   });
-  atualizarRemSection();
 
   $('modal').classList.add('open');
+}
+
+function selChip(el, inputId) {
+  var parent = el.parentNode;
+  parent.querySelectorAll('.chip').forEach(function(c) { c.className = 'chip'; });
+  el.classList.add('selected');
+  $(inputId).value = el.textContent.trim();
 }
 
 function fecharModal() {
@@ -1916,14 +1789,8 @@ function definirStatus(s) {
   document.querySelectorAll('.status-btn').forEach(b => {
     if (b.classList.contains(map[s])) b.classList.add('active');
   });
-  atualizarRemSection();
   const el = $('modal-status');
   if (el) el.textContent = s;
-}
-
-function atualizarRemSection() {
-  const rs = $('rem-section');
-  if (rs) rs.classList.toggle('open', statusSel === 'REMARCADA');
 }
 
 // ═════════════════════════════════════════════════════════
@@ -1935,52 +1802,38 @@ async function salvar() {
   const item = dados[editando.idx];
   if (!item) return;
 
-  if (statusSel === 'REMARCADA') {
-    const nd = $('f-nova-data').value.trim();
-    const nh = $('f-novo-horario').value.trim();
-    if (!nd || !nh) {
-      mostrarToast('⚠️ Para REMARCADA, preencha Nova Data e Novo Horário.');
-      return;
-    }
-  }
-
-  const isConfirmada = statusSel === 'CONFIRMADA';
-  const params = new URLSearchParams({
-    action: 'updateStatus',
-    sheet: editando.db === 'db1' ? 'database1' : 'database2',
-    id: item.id,
-    status: statusSel === 'CONFIRMADA' ? '' : statusSel,
-    novaData: statusSel === 'REMARCADA' ? dataToBR($('f-nova-data').value) : '',
-    novoHorario: statusSel === 'REMARCADA' ? $('f-novo-horario').value.trim() : '',
-    novoInstrutor: statusSel === 'REMARCADA' ? $('f-novo-instrutor').value.trim() : '',
-    novoLocal: statusSel === 'REMARCADA' ? $('f-novo-local').value.trim() : '',
-  });
+  var horario = ($('f-horario')?.value || '').trim();
+  var instrutor = ($('f-instrutores')?.value || '').trim();
+  var local = ($('f-local')?.value || '').trim();
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?${params}`);
-    const json = await res.json();
+    var json = await fetchJSONP({
+      action: 'updateStatus',
+      codigo: item.codigo || '',
+      data: item.data || '',
+      nome: item.nome || '',
+      tipo: item.tipo || '',
+      eixo: item.eixo || '',
+      vagas: String(item.vagas || ''),
+      parceria: item.parceria || '',
+      turmaAberta: item.turmaAberta || '',
+      publicoAlvo: item.publicoAlvo || '',
+      turno: item.turno || '',
+      horario: horario,
+      instrutor: instrutor,
+      local: local,
+      status: statusSel || 'CONFIRMADA'
+    });
     if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
 
-    // Atualiza local
-    if (isConfirmada) {
-      item.status = ''; item.novaData = ''; item.novoHorario = '';
-      item.novoInstrutor = ''; item.novoLocal = '';
-    } else {
-      item.status = statusSel;
-      if (statusSel === 'REMARCADA') {
-        item.novaData = dataToBR($('f-nova-data').value);
-        item.novoHorario = $('f-novo-horario').value.trim();
-        item.novoInstrutor = $('f-novo-instrutor').value.trim();
-        item.novoLocal = $('f-novo-local').value.trim();
-      } else {
-        item.novaData = ''; item.novoHorario = '';
-        item.novoInstrutor = ''; item.novoLocal = '';
-      }
-    }
+    item.horario = horario;
+    item.instrutores = instrutor;
+    item.local = local;
+    item.status = statusSel;
 
     fecharModal();
     renderizar();
-    mostrarToast('✅ Salvo na planilha!');
+    mostrarToast('✅ Salvo!');
   } catch (e) {
     console.error(e);
     mostrarToast('❌ Erro: ' + e.message);
@@ -2006,8 +1859,7 @@ function matchesSearch(item, term) {
   const t = term.toLowerCase();
   return [
     item.nome, item.san, item.eixo, item.instrutores, item.parceria,
-    item.data, item.horario, item.tipo, item.local, item.turma,
-    item.novaData, item.novoHorario, item.novoInstrutor, item.novoLocal,
+    item.data, item.horario, item.tipo, item.local, item.codigo,
     item.turmaAberta, item.publicoAlvo
   ].some(v => v && String(v).toLowerCase().includes(t));
 }
@@ -2039,10 +1891,6 @@ function navegar(page) {
   if (nav) nav.classList.add('active');
 
   $('topbar-title').textContent = PAGE_TITLES[page] || page;
-
-  // Só exibe botão Baixar Agenda nas páginas db1/db2
-  const dl = $('dl-btn');
-  if (dl) dl.style.display = (page === 'db1' || page === 'db2') ? '' : 'none';
 
   // Render on demand
   if (page === 'home') renderDashboard();
@@ -2076,6 +1924,9 @@ function togglePin() {
 }
 
 function initPin() {
+  const mode = localStorage.getItem('nave_config_sidebarMode') || 'expanded';
+  if (mode === 'collapsed') { $('sidebar').classList.add('collapsed'); return; }
+  if (mode === 'hidden') { $('sidebar').classList.add('hidden'); return; }
   const pinned = localStorage.getItem('nave_sidebar_pinned') === '1';
   if (pinned) {
     $('sidebar').classList.add('pinned');
@@ -2093,8 +1944,6 @@ function toggleOverflow(e) {
   const menu = $('overflow-menu');
   menu.classList.toggle('open');
   if (menu.classList.contains('open')) {
-    const dlItem = $('overflow-dl');
-    if (dlItem) dlItem.href = $('dl-btn').href;
     setTimeout(() => {
       document.addEventListener('click', () => menu.classList.remove('open'), { once: true });
     }, 0);
@@ -2152,62 +2001,59 @@ function abrirModalPanel(item, db, idx) {
   panelEditando = { db, idx };
   panelStatus = item.status || 'CONFIRMADA';
 
-  const fields = [
-    { key:'id', label:'Código', readonly:true },
-    { key:'san', label:'Turma' },
-    { key:'nome', label:'Nome' },
-    { key:'tipo', label:'Tipo', chip:true, chips:['CURSO','OFICINA','PALESTRA','EVENTO','WORKSHOP'] },
-    { key:'eixo', label:'Eixo' },
-    { key:'vagas', label:'Vagas' },
-    { key:'data', label:'Data' },
-    { key:'horario', label:'Horário' },
-    { key:'local', label:'Local' },
-  ];
+  var dataVal = item.data || '';
+  var dataParts = dataVal.split('/');
+  var dataISO = dataParts.length === 3 ? dataParts[2]+'-'+dataParts[1]+'-'+dataParts[0] : '';
 
-  let body = fields.map(f => {
-    const val = item[f.key] || '';
-    if (f.chip) {
-      const chips = f.chips.map(c =>
-        `<span class="chip ${val.toUpperCase() === c ? 'selected-'+panelStatus : ''}" onclick="panelSetTipo('${c}',this)">${c}</span>`
-      ).join('');
-      return `<div class="field-group"><span class="field-label">${f.label}</span><div class="field-chips">${chips}</div></div>`;
-    }
-    return `<div class="field-group"><span class="field-label">${f.label}</span>
-      <input class="field-input" id="panel-${f.key}" value="${escapeHtml(val)}" ${f.readonly ? 'readonly' : ''}></div>`;
-  }).join('');
-
-  const instVal = item.instrutores || '';
-  body += `<div class="field-group"><span class="field-label">Instrutores</span>${instChipsHtml(instVal, 'panel-instrutores', true)}
-    <input class="field-input" id="panel-instrutores" value="${escapeHtml(instVal)}"></div>`;
-
-  body += `<div class="field-group"><span class="field-label">Status</span>
-    <div class="status-group">
-      <button class="status-btn active-conf" onclick="panelSetStatus('CONFIRMADA')">✅ CONFIRMADA</button>
-      <button class="status-btn" onclick="panelSetStatus('REMARCADA')">🔄 REMARCADA</button>
-      <button class="status-btn" onclick="panelSetStatus('CANCELADA')">❌ CANCELADA</button>
-    </div></div>`;
-
-  const pNovaData = item.novaData || '';
-  const pDataParts = pNovaData.split('/');
-  const pDataISO = pDataParts.length === 3 ? pDataParts[2]+'-'+pDataParts[1]+'-'+pDataParts[0] : '';
-  body += `<div class="remark-fields ${panelStatus === 'REMARCADA' ? 'visible' : ''}" id="panel-rem-section">
-    <span class="remark-label">Dados da Remarcação</span>
-    <div class="field-group"><span class="field-label">Nova Data</span>
-    <input class="field-input" id="panel-novaData" type="date" value="${escapeHtml(pDataISO)}"></div>
-    <div class="field-group"><span class="field-label">Novo Horário</span>
-    ${optChipsHtml(['09h às 12h','14h às 17h','18h às 21h'], item.novoHorario || '', 'panel-novoHorario')}
-    <input class="field-input" id="panel-novoHorario" value="${escapeHtml(item.novoHorario || '')}" style="display:none;"></div>
-    <div class="field-group"><span class="field-label">Novo Instrutor</span>
-    ${instChipsHtml(item.novoInstrutor || '', 'panel-novoInstrutor', false)}
-    <input class="field-input" id="panel-novoInstrutor" type="hidden" value="${escapeHtml(item.novoInstrutor || '')}"></div>
-    <div class="field-group"><span class="field-label">Novo Local</span>
-    ${optChipsHtml(['SALA I','LAN TABLE'], item.novoLocal || '', 'panel-novoLocal')}
-    <input class="field-input" id="panel-novoLocal" value="${escapeHtml(item.novoLocal || '')}" style="display:none;"></div>
-  </div>`;
+  let body = `
+    <div class="field-group"><span class="field-label">Código</span>
+      <input class="field-input" id="panel-id" value="${escapeHtml(item.id || '')}" readonly></div>
+    <div class="field-group"><span class="field-label">Turma</span>
+      <input class="field-input" id="panel-san" value="${escapeHtml(item.san || '')}"></div>
+    <div class="field-group"><span class="field-label">Nome</span>
+      <input class="field-input" id="panel-nome" value="${escapeHtml(item.nome || '')}"></div>
+    <div class="field-group"><span class="field-label">Tipo</span>
+      <div class="field-chips">${['CURSO','OFICINA','PALESTRA','EVENTO','WORKSHOP'].map(c =>
+        `<span class="chip ${(item.tipo||'').toUpperCase()===c?'selected-'+panelStatus:''}" onclick="panelSetTipo('${c}',this)">${c}</span>`
+      ).join('')}</div>
+      <input type="hidden" id="panel-tipo" value="${escapeHtml(item.tipo || '')}"></div>
+    <div class="field-group"><span class="field-label">Eixo</span>
+      <input class="field-input" id="panel-eixo" value="${escapeHtml(item.eixo || '')}"></div>
+    <div class="field-group"><span class="field-label">Vagas</span>
+      <input class="field-input" id="panel-vagas" value="${item.vagas || ''}"></div>
+    <div class="field-group"><span class="field-label">Data</span>
+      <input class="field-input" id="panel-data" value="${escapeHtml(dataVal || '—')}" readonly></div>
+    <div class="field-group"><span class="field-label">Horário</span>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        ${['09h às 12h','14h às 17h','18h às 21h'].map(h =>
+          `<span class="chip ${(item.horario||'').trim()===h?'selected-'+panelStatus:''}" onclick="panelSelChip(this,'panel-horario')">${h}</span>`
+        ).join('')}
+        <input class="field-input" id="panel-horario" value="${escapeHtml(item.horario || '')}" placeholder="Ou digite" style="flex:1;min-width:120px;"></div></div>
+    <div class="field-group"><span class="field-label">Local</span>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        ${['SALA I','LAN TABLE'].map(l =>
+          `<span class="chip ${(item.local||'').trim()===l?'selected-'+panelStatus:''}" onclick="panelSelChip(this,'panel-local')">${l}</span>`
+        ).join('')}
+        <input class="field-input" id="panel-local" value="${escapeHtml(item.local || '')}" placeholder="Ou digite" style="flex:1;min-width:120px;"></div></div>
+    <div class="field-group"><span class="field-label">Instrutores</span>${instChipsHtml(item.instrutores || '', 'panel-instrutores', true)}
+      <input class="field-input" id="panel-instrutores" value="${escapeHtml(item.instrutores || '')}"></div>
+    <div class="field-group"><span class="field-label">Status</span>
+      <div class="status-group">
+        <button class="status-btn active-conf" onclick="panelSetStatus('CONFIRMADA')">✅ CONFIRMADA</button>
+        <button class="status-btn" onclick="panelSetStatus('REMARCADA')">🔄 REMARCADA</button>
+        <button class="status-btn" onclick="panelSetStatus('CANCELADA')">❌ CANCELADA</button>
+      </div></div>`;
 
   $('panel-body').innerHTML = body;
   $('panel-san').textContent = item.san || '—';
   $('modal-panel-overlay').classList.add('open');
+}
+
+function panelSelChip(el, inputId) {
+  var parent = el.parentNode;
+  parent.querySelectorAll('.chip').forEach(function(c) { c.className = 'chip'; });
+  el.classList.add('selected');
+  $(inputId).value = el.textContent.trim();
 }
 
 function fecharModalPanel() {
@@ -2223,8 +2069,6 @@ function panelSetStatus(s) {
     if (s === 'REMARCADA' && b.textContent.includes('REMARCADA')) b.classList.add('active-rem');
     if (s === 'CANCELADA' && b.textContent.includes('CANCELADA')) b.classList.add('active-canc');
   });
-  const rs = $('panel-rem-section');
-  if (rs) rs.classList.toggle('visible', s === 'REMARCADA');
 }
 
 function panelSetTipo(val, el) {
@@ -2246,44 +2090,34 @@ async function salvarPanel() {
   const item = dados[panelEditando.idx];
   if (!item) return;
 
-  if (panelStatus === 'REMARCADA') {
-    const nd = ($('panel-novaData')?.value || '').trim();
-    const nh = ($('panel-novoHorario')?.value || '').trim();
-    if (!nd || !nh) { mostrarToast('⚠️ Preencha Nova Data e Novo Horário para REMARCADA.'); return; }
-  }
-
-  const isConfirmada = panelStatus === 'CONFIRMADA';
-  const params = new URLSearchParams({
-    action: 'updateStatus',
-    sheet: panelEditando.db === 'db1' ? 'database1' : 'database2',
-    id: item.id,
-    status: panelStatus === 'CONFIRMADA' ? '' : panelStatus,
-    novaData: panelStatus === 'REMARCADA' ? dataToBR($('panel-novaData')?.value || '') : '',
-    novoHorario: panelStatus === 'REMARCADA' ? ($('panel-novoHorario')?.value || '').trim() : '',
-    novoInstrutor: panelStatus === 'REMARCADA' ? ($('panel-novoInstrutor')?.value || '').trim() : '',
-    novoLocal: panelStatus === 'REMARCADA' ? ($('panel-novoLocal')?.value || '').trim() : '',
-  });
+  var horario = ($('panel-horario')?.value || '').trim();
+  var local = ($('panel-local')?.value || '').trim();
+  var instrutor = ($('panel-instrutores')?.value || '').trim();
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?${params}`);
-    const json = await res.json();
+    var json = await fetchJSONP({
+      action: 'updateStatus',
+      codigo: item.codigo || '',
+      data: item.data || '',
+      nome: item.nome || '',
+      tipo: item.tipo || '',
+      eixo: item.eixo || '',
+      vagas: String(item.vagas || ''),
+      parceria: item.parceria || '',
+      turmaAberta: item.turmaAberta || '',
+      publicoAlvo: item.publicoAlvo || '',
+      turno: item.turno || '',
+      horario: horario,
+      instrutor: instrutor,
+      local: local,
+      status: panelStatus || 'CONFIRMADA'
+    });
     if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
 
-    if (isConfirmada) {
-      item.status = ''; item.novaData = ''; item.novoHorario = '';
-      item.novoInstrutor = ''; item.novoLocal = '';
-    } else {
-      item.status = panelStatus;
-      if (panelStatus === 'REMARCADA') {
-        item.novaData = dataToBR($('panel-novaData')?.value || '');
-        item.novoHorario = ($('panel-novoHorario')?.value || '').trim();
-        item.novoInstrutor = ($('panel-novoInstrutor')?.value || '').trim();
-        item.novoLocal = ($('panel-novoLocal')?.value || '').trim();
-      } else {
-        item.novaData = ''; item.novoHorario = '';
-        item.novoInstrutor = ''; item.novoLocal = '';
-      }
-    }
+    item.horario = horario;
+    item.local = local;
+    item.instrutores = instrutor;
+    item.status = panelStatus;
 
     fecharModalPanel();
     if (currentPage === 'hoje') renderHoje();
@@ -2656,7 +2490,7 @@ function doRenderGrid(container) {
 
 function reflowGadgets() {
   const container = $('dash-grid-container');
-  if (!container || !container.children.length || !gadgetLayout) return;
+  if (!container || !container.children.length) return;
   calcGrid();
   container.style.height = calcContainerHeight() + 'px';
   gadgetLayout.forEach(g => {
@@ -2682,75 +2516,7 @@ function animateCount(el, target, duration) {
 }
 
 function todasAulas() {
-  const das = [...DB1, ...DB2];
-  NOVAS_AULAS.forEach(function(na) {
-    if (!na.data) return;
-    das.push({
-      id: 'na_' + (na.id || Math.random().toString(36).slice(2, 8)),
-      nome: na.nome || '',
-      tipo: na.tipo || '',
-      eixo: na.eixo || '',
-      data: na.data,
-      horario: na.horario || '',
-      instrutores: na.instrutores || '',
-      local: na.local || '',
-      turmaAberta: na.turmaAberta || '',
-      parceria: na.parceria || '',
-      publicoAlvo: na.publicoAlvo || '',
-      status: 'CONFIRMADA',
-      horaInicio: '',
-      horaFim: '',
-      _naIdx: NOVAS_AULAS.indexOf(na),
-    });
-  });
-  return das;
-}
-
-let AULAS_HIST_CACHE = {};
-
-function aulasParaCalendario() {
-  const todas = todasAulas();
-  Object.values(AULAS_HIST_CACHE).forEach(arr => todas.push(...arr));
-  return todas;
-}
-
-async function garantirMesCalendario(ano, mes) {
-  const agora = new Date();
-  const mesAtualNum = agora.getMonth();
-  const anoAtualNum = agora.getFullYear();
-  const proxMesNum = mesAtualNum === 11 ? 0 : mesAtualNum + 1;
-  const proxAnoNum = mesAtualNum === 11 ? anoAtualNum + 1 : anoAtualNum;
-
-  if ((ano === anoAtualNum && mes === mesAtualNum) || (ano === proxAnoNum && mes === proxMesNum)) {
-    return;
-  }
-
-  const key = `${ano}-${String(mes+1).padStart(2,'0')}`;
-  if (AULAS_HIST_CACHE[key]) return;
-
-  try {
-    const r = await fetch(`${SCRIPT_URL}?action=getSnapshotData&aba=database1&mes=${key}`).then(r => r.json());
-    AULAS_HIST_CACHE[key] = (r.rows || []).map((row,i) => rowToAula(row, 0)).filter(Boolean);
-  } catch (e) {
-    console.warn('[garantirMesCalendario] erro:', e);
-    AULAS_HIST_CACHE[key] = [];
-  }
-}
-
-async function prepararCalendario() {
-  const ano = calDate.getFullYear();
-  const mes = calDate.getMonth();
-  await garantirMesCalendario(ano, mes);
-
-  if (calView === 'semana') {
-    const ini = new Date(calDate);
-    ini.setDate(ini.getDate() - ini.getDay());
-    const fim = new Date(ini);
-    fim.setDate(fim.getDate() + 6);
-    if (fim.getMonth() !== mes) {
-      await garantirMesCalendario(fim.getFullYear(), fim.getMonth());
-    }
-  }
+  return [...DB1, ...DB2];
 }
 
 function parseHorario(h) {
@@ -2765,7 +2531,7 @@ const INST_PALETTE = ['#3b82f6','#f97316','#eab308','#22c55e','#a855f7','#ec4899
 function instrColor(name) {
   if (!name) return 'var(--accent)';
   const n = name.toUpperCase().trim();
-  const idx = instrutoresData.findIndex(p => p.nickname === n);
+  const idx = instrutoresData.findIndex(p => p.apelido === n);
   if (idx !== -1) return INST_PALETTE[idx % INST_PALETTE.length];
   let hash = 0;
   for (let i = 0; i < n.length; i++) hash = n.charCodeAt(i) + ((hash << 5) - hash);
@@ -2779,32 +2545,29 @@ function calDateStr(d) {
 let calView = 'semana';
 let calDate = new Date();
 
-async function setCalView(v) {
+function setCalView(v) {
   calView = v;
   ['dia','semana','mes'].forEach(t => {
     const el = $('cal-tab-'+t);
     if (el) el.classList.toggle('active', t===v);
   });
-  await prepararCalendario();
   renderCalView();
 }
 
-async function calNavegar(delta) {
+function calNavegar(delta) {
   if (calView === 'dia')    calDate.setDate(calDate.getDate() + delta);
   if (calView === 'semana') calDate.setDate(calDate.getDate() + delta*7);
   if (calView === 'mes')    calDate.setMonth(calDate.getMonth() + delta);
-  await prepararCalendario();
   renderCalView();
 }
 
-async function calClicarDia(dia) {
+function calClicarDia(dia) {
   calView = 'dia';
   calDate = new Date(calDate.getFullYear(), calDate.getMonth(), dia);
   ['dia','semana','mes'].forEach(t => {
     const el = $('cal-tab-'+t);
     if (el) el.classList.toggle('active', t==='dia');
   });
-  await prepararCalendario();
   renderCalView();
 }
 
@@ -2830,20 +2593,18 @@ function renderCalView() {
 
 function renderCalDia(d) {
   const dateStr = calDateStr(d);
-  const aulas = aulasParaCalendario().filter(a => a.data === dateStr && (a.status||'CONFIRMADA') !== 'CANCELADA');
+  const aulas = todasAulas().filter(a => a.data === dateStr && (a.status||'CONFIRMADA') !== 'CANCELADA');
   if (!aulas.length) return `<div style="text-align:center;color:var(--text3);font-size:12px;padding:20px 0;">Nenhuma aula neste dia</div>`;
 
   let html = `<div style="display:flex;flex-direction:column;gap:8px;">`;
   aulas.forEach(a => {
     const color = instrColor(a.instrutores);
-    const db = DB2.includes(a) ? 'db2' : (DB1.includes(a) ? 'db1' : '');
+    const db = DB2.includes(a) ? 'db2' : 'db1';
     const idx = DB2.includes(a) ? DB2.indexOf(a) : DB1.indexOf(a);
-    const clickable = DB1.includes(a) || DB2.includes(a);
-    const onclickAttr = clickable ? `onclick="abrirModal('${db}',${idx})"` : '';
-    html += `<div ${onclickAttr} style="
+    html += `<div onclick="abrirModal('${db}',${idx})" style="
       background:${color}22;border-left:3px solid ${color};border-radius:0 8px 8px 0;
-      padding:10px 12px;${clickable ? 'cursor:pointer;transition:background 0.15s;' : 'opacity:0.7;'}"
-      ${clickable ? `onmouseover="this.style.background='${color}44'" onmouseout="this.style.background='${color}22'"` : ''}>
+      padding:10px 12px;cursor:pointer;transition:background 0.15s;"
+      onmouseover="this.style.background='${color}44'" onmouseout="this.style.background='${color}22'">
       <div style="font-weight:700;font-size:12px;color:${color};">${a.nome}</div>
       <div style="font-size:11px;color:var(--text2);margin-top:3px;">🕐 ${a.horario} · 📍 ${a.local}</div>
       <div style="font-size:11px;color:var(--text3);">${a.instrutores}</div>
@@ -2870,7 +2631,7 @@ function renderCalSemana(inicioSemana) {
       <div style="font-size:13px;font-weight:700;${isToday?'background:var(--accent);color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:2px auto;':'color:var(--text);'}">${d.getDate()}</div></div>`;
   });
   html += `</div>`;
-  const aulas = aulasParaCalendario().filter(a => (a.status||'CONFIRMADA') !== 'CANCELADA');
+  const aulas = todasAulas().filter(a => (a.status||'CONFIRMADA') !== 'CANCELADA');
   html += `<div style="display:grid;grid-template-columns:36px repeat(7,1fr);gap:1px;">`;
   HORARIOS.forEach(hora => {
     const h = parseInt(hora);
@@ -2884,10 +2645,8 @@ function renderCalSemana(inicioSemana) {
       if (slot.length > 0) {
         const a = slot[0];
         const color = instrColor(a.instrutores);
-        const clickable = DB1.includes(a) || DB2.includes(a);
-        const onclickAttr = clickable ? `onclick="abrirModal('${DB2.includes(a)?'db2':'db1'}',${DB2.includes(a)?DB2.indexOf(a):DB1.indexOf(a)})"` : '';
-        html += `<div ${onclickAttr} style="
-          background:${color};border-radius:4px;padding:3px 4px;${clickable ? 'cursor:pointer;' : ''}
+        html += `<div onclick="abrirModal('${DB2.includes(a)?'db2':'db1'}',${DB2.includes(a)?DB2.indexOf(a):DB1.indexOf(a)})" style="
+          background:${color};border-radius:4px;padding:3px 4px;cursor:pointer;
           font-size:9px;font-weight:600;color:white;line-height:1.2;
           min-height:28px;overflow:hidden;" title="${a.nome}">${a.nome.length>15?a.nome.slice(0,15)+'…':a.nome}</div>`;
       } else {
@@ -2906,7 +2665,7 @@ function renderCalMes() {
   const todayStr = calDateStr(today);
   const firstDay = new Date(ano, mes, 1).getDay();
   const daysInMonth = new Date(ano, mes+1, 0).getDate();
-  const aulas = aulasParaCalendario().filter(a => (a.status||'CONFIRMADA') !== 'CANCELADA');
+  const aulas = todasAulas().filter(a => (a.status||'CONFIRMADA') !== 'CANCELADA');
   const aulasPorDia = {};
   aulas.forEach(a => {
     if (!a.data || !a.data.includes('/')) return;
@@ -3006,8 +2765,8 @@ function renderGadgetContents() {
       // ── DONUT por Instrutor ──
       case 'donut': {
         const instructors = {};
-        instrutoresData.forEach(p => {
-          if (p.nickname) instructors[p.nickname] = 0;
+        (instrutoresData.length ? instrutoresData : INSTRUTORES_SEED).forEach(p => {
+          if (p.apelido) instructors[p.apelido] = 0;
         });
         mesAtualAulas.forEach(a => {
           if (a.instrutores) {
@@ -3154,7 +2913,6 @@ function renderDashboard() {
 }
 
 function abrirPanelEdit(aulaId) {
-  if (aulaId && aulaId.startsWith('na_')) return; // novas atividades são editadas no próprio módulo
   const todas = [...DB1.map((a,i)=>({...a,_db:'db1',_idx:i})), ...DB2.map((a,i)=>({...a,_db:'db2',_idx:i}))];
   const found = todas.find(a => a.id === aulaId);
   if (found) abrirModalPanel(found, found._db, found._idx);
@@ -3352,7 +3110,7 @@ function popularNAFInstChips() {
   const container = $('naf-inst-chips');
   if (!container) return;
   const nomes = instrutoresData && instrutoresData.length
-    ? instrutoresData.map(i => i.nickname || i.nome).filter(Boolean)
+    ? instrutoresData.map(i => i.apelido || i.nome).filter(Boolean)
     : ['DIEGO','GABRIEL','ALLAN','WAGNER'];
   container.innerHTML = nomes.map(n =>
     `<div class="chip" onclick="toggleNAFInst('${esc(n)}')">${esc(n)}</div>`
@@ -3377,6 +3135,7 @@ function selNAFChip(inputId, value) {
   if (fg) fg.querySelectorAll('.chip').forEach(c => {
     c.classList.toggle('selected-CONFIRMADA', c.textContent === value || c.textContent.includes(value) || value.includes(c.textContent));
   });
+  if (['naf-tipo','naf-instrutores'].includes(inputId)) atualizarCodigoPreview();
 }
 
 // ── NA Calendar ──
@@ -3475,21 +3234,23 @@ function preencherNAForm(item) {
   document.querySelectorAll('#naf-inst-chips .chip').forEach(c => {
     c.classList.toggle('selected-CONFIRMADA', item.instrutores && item.instrutores.split('/').includes(c.textContent));
   });
+  atualizarCodigoPreview();
 }
 function limparNAForm() {
   ['naf-eixo','naf-nome','naf-tipo','naf-data','naf-horario','naf-turmaAberta','naf-parceria','naf-instrutores','naf-local','naf-publicoAlvo']
     .forEach(id => $(id).value = '');
+  atualizarCodigoPreview();
   document.querySelectorAll('.na-form-body .chip').forEach(c => c.classList.remove('selected-CONFIRMADA'));
   nafEditandoRow = null;
   $('naf-error').style.display = 'none';
 }
 
-function salvarNovaAtividade() {
-  const dados = lerNAForm();
+async function salvarNovaAtividade() {
+  const data = lerNAForm();
   const erros = [];
-  if (!dados.nome) erros.push('Nome da Atividade');
-  if (!dados.tipo) erros.push('Tipo');
-  if (!dados.data) erros.push('Data');
+  if (!data.nome) erros.push('Nome da Atividade');
+  if (!data.tipo) erros.push('Tipo');
+  if (!data.data) erros.push('Data');
   if (erros.length) {
     const errEl = $('naf-error');
     errEl.style.display = 'block';
@@ -3498,45 +3259,20 @@ function salvarNovaAtividade() {
   }
   $('naf-error').style.display = 'none';
 
-  const btn = $('naf-salvar-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
+  var ok = false;
+  if (nafEditandoRow !== null) {
+    var item = NOVAS_AULAS[nafEditandoRow];
+    Object.assign(item, data);
+    ok = await saveNAviaScript(item);
+    if (ok) nafEditandoRow = null;
+  } else {
+    ok = await addNAviaScript(data);
+  }
+  if (!ok) { mostrarToast('❌ Erro ao salvar. Verifique o console.'); return; }
 
-  const isEditing = nafEditandoRow !== null;
-  const item = isEditing ? NOVAS_AULAS[nafEditandoRow] : null;
-  const action = isEditing ? 'salvarNovaAtividadeDrive' : 'salvarNovaAtividadeDrive';
-
-  const p = new URLSearchParams({ action: action, nome: dados.nome, tipo: dados.tipo, data: dados.data });
-  if (dados.eixo)        p.set('eixo', dados.eixo);
-  if (dados.horario)     p.set('horario', dados.horario);
-  if (dados.turmaAberta) p.set('turmaAberta', dados.turmaAberta);
-  if (dados.parceria)    p.set('parceria', dados.parceria);
-  if (dados.instrutores) p.set('instrutores', dados.instrutores);
-  if (dados.local)       p.set('local', dados.local);
-  if (dados.publicoAlvo) p.set('publicoAlvo', dados.publicoAlvo);
-  if (isEditing && item) p.set('id', item.id);
-  else { p.set('cadastroEm', new Date().toISOString()); }
-
-  fetch(`${SCRIPT_URL}?${p}`).then(r => r.json()).then(json => {
-    if (!json.ok) throw new Error(json.error || 'Erro ao salvar');
-
-    if (isEditing && item) {
-      Object.assign(item, dados);
-    } else {
-      dados.id = json.id || String(Date.now());
-      dados.cadastroEm = p.get('cadastroEm') || new Date().toISOString();
-      NOVAS_AULAS.push(dados);
-    }
-
-    nafEditandoRow = null;
-    $('naf-form-header').textContent = 'Nova Atividade';
-    limparNAForm();
-    renderNovasAtividades();
-    mostrarToast('✅ Salvo no Drive!');
-  }).catch(err => {
-    mostrarToast('❌ Erro ao salvar: ' + err.message);
-  }).finally(() => {
-    if (btn) { btn.disabled = false; btn.textContent = 'Salvar Atividade'; }
-  });
+  $('naf-form-header').textContent = 'Nova Atividade';
+  limparNAForm();
+  await carregar();
 }
 
 function editarNA(idx) {
@@ -3547,15 +3283,78 @@ function editarNA(idx) {
   $('naf-form-header').textContent = 'Editar Atividade';
 }
 
-function excluirNA(idx) {
+async function excluirNA(idx) {
   const item = NOVAS_AULAS[idx];
   if (!item) return;
   if (!confirm(`Excluir "${item.nome || 'esta atividade'}"?`)) return;
-  NOVAS_AULAS.splice(idx, 1);
+  await deleteNAviaScript(item);
   if (nafEditandoRow === idx) { limparNAForm(); }
-  renderNovasAtividades();
-  if (item.id) {
-    fetch(`${SCRIPT_URL}?action=excluirNovaAtividadeDrive&id=${item.id}`).then(r => r.json()).catch(() => {});
+  await carregar();
+}
+
+// ── NA CRUD via Apps Script ──
+function gerarCodigoTurma(nome, tipo, instrutores, data) {
+  var nomeClean = (nome || '').replace(/\s+/g, '').toUpperCase();
+  var instClean = (instrutores || '').replace(/\s+/g, '').toUpperCase().substring(0, 3);
+  if (!nomeClean || nomeClean.length < 3) return '';
+  var tipoCode = ({ CURSO: '1', OFICINA: '2' }[tipo] || '3');
+  var primeiras = nomeClean.substring(0, 3);
+  var ultimas = nomeClean.length >= 3 ? nomeClean.slice(-3) : nomeClean;
+  var partes = (data || '').split('/');
+  var ddmm = partes.length === 3 ? partes[0] + partes[1] : '';
+  return 'INT' + primeiras + tipoCode + ultimas + instClean + ddmm;
+}
+
+function atualizarCodigoPreview() {
+  var el = $('naf-codigo');
+  if (!el) return;
+  var nome = ($('naf-nome')?.value || '').trim();
+  var tipo = ($('naf-tipo')?.value || '').trim();
+  var instrutores = ($('naf-instrutores')?.value || '').trim();
+  var data = ($('naf-data')?.value || '').trim();
+  var codigo = gerarCodigoTurma(nome, tipo, instrutores, data);
+  el.value = codigo;
+  el.title = codigo || 'Preencha nome, tipo, instrutor e data para gerar';
+}
+
+async function addNAviaScript(data) {
+  try {
+    if (!data.codigo) data.codigo = gerarCodigoTurma(data.nome, data.tipo, data.instrutores, data.data) || 'NA' + Date.now().toString(36).toUpperCase();
+    var params = { action: 'addAtividade' };
+    Object.keys(data).forEach(function(k) { params[k] = data[k] || ''; });
+    var json = await fetchJSONP(params);
+    if (!json.ok) throw new Error(json.error || 'Erro ao adicionar');
+    return true;
+  } catch (e) {
+    console.warn('[addNAviaScript]', e);
+    return false;
+  }
+}
+
+async function saveNAviaScript(data) {
+  try {
+    var params = { action: 'updateAtividade', codigo: data.codigo || '', data: data.data || '' };
+    Object.keys(data).forEach(function(k) {
+      if (k !== 'codigo' && k !== 'data') params[k] = data[k] || '';
+    });
+    params.status = data.status || 'CONFIRMADA';
+    var json = await fetchJSONP(params);
+    if (!json.ok) throw new Error(json.error || 'Erro ao atualizar');
+    return true;
+  } catch (e) {
+    console.warn('[saveNAviaScript]', e);
+    return false;
+  }
+}
+
+async function deleteNAviaScript(data) {
+  try {
+    var json = await fetchJSONP({ action: 'deleteAtividade', codigo: data.codigo || '', data: data.data || '' });
+    if (!json.ok) throw new Error(json.error || 'Erro ao excluir');
+    return true;
+  } catch (e) {
+    console.warn('[deleteNAviaScript]', e);
+    return false;
   }
 }
 
@@ -3580,9 +3379,11 @@ function setConfig(key, val) {
   localStorage.setItem('nave_config_' + key, val);
   if (key === 'sidebarMode') {
     const s = $('sidebar');
-    s.classList.remove('collapsed');
+    s.classList.remove('hidden', 'collapsed', 'pinned');
+    $('pin-btn').classList.remove('pinned');
+    localStorage.setItem('nave_sidebar_pinned', '0');
     if (val === 'collapsed') s.classList.add('collapsed');
-    if (val === 'pinned') { s.classList.remove('collapsed'); $('pin-btn').classList.add('pinned'); localStorage.setItem('nave_sidebar_pinned','1'); }
+    if (val === 'hidden') s.classList.add('hidden');
   }
   if (key === 'autoSync' && val === '1') {
     carregar();
@@ -3604,12 +3405,17 @@ function cycleFontSize(dir) {
   const sizes = ['small','normal','large','xlarge'];
   const cur = localStorage.getItem('nave_config_fontSize') || 'normal';
   const idx = sizes.indexOf(cur);
-  const next = dir === 0 ? 'normal' : sizes[Math.max(0, Math.min(sizes.length-1, idx + dir))];
+  if (dir === 0) {
+    setFontSize('normal');
+    if (fEl = $('config-font-size')) fEl.value = 'normal';
+    mostrarToast('🔤 Fonte: Normal');
+    return;
+  }
+  const next = sizes[Math.max(0, Math.min(sizes.length-1, idx + dir))];
   setFontSize(next);
   const fEl = $('config-font-size');
   if (fEl) fEl.value = next;
-  const labels = { small:'🔤 Fonte: Pequena', normal:'🔤 Fonte: Normal', large:'🔤 Fonte: Grande', xlarge:'🔤 Fonte: Extra Grande' };
-  mostrarToast(labels[next] || labels.normal);
+  mostrarToast({ small:'🔤 Fonte: Pequena', normal:'🔤 Fonte: Normal', large:'🔤 Fonte: Grande', xlarge:'🔤 Fonte: Extra Grande' }[next]);
 }
 
 function setHighContrast(on) {
@@ -3617,6 +3423,11 @@ function setHighContrast(on) {
   localStorage.setItem('nave_config_highContrast', on ? '1' : '0');
   const btn = $('topbar-contrast-btn');
   if (btn) btn.style.color = on ? 'var(--accent)' : '';
+}
+
+function setColoredBars(on) {
+  document.body.classList.toggle('colored-bars', on);
+  localStorage.setItem('nave_config_coloredBars', on ? '1' : '0');
 }
 
 function toggleContrast() {
@@ -3649,17 +3460,14 @@ function loadConfig() {
   if (fEl) fEl.value = fontSize;
   document.documentElement.dataset.fontSize = fontSize;
   const fontLbl = $('topbar-font-label');
-  if (fontLbl) fontLbl.textContent = { normal:'Aa', large:'Aa', xlarge:'Aa' }[fontSize] || 'Aa';
+  if (fontLbl) fontLbl.textContent = { small:'Aa', normal:'Aa', large:'Aa', xlarge:'Aa' }[fontSize] || 'Aa';
   const hc = localStorage.getItem('nave_config_highContrast') === '1';
   const hcEl = $('config-high-contrast');
   if (hcEl) hcEl.checked = hc;
   document.body.classList.toggle('high-contrast', hc);
   const hcBtn = $('topbar-contrast-btn');
   if (hcBtn) hcBtn.style.color = hc ? 'var(--accent)' : '';
-  const sidEl = $('config-sheet-id');
-  if (sidEl) sidEl.textContent = SHEET_ID;
-  const linkEl = $('config-sheet-link');
-  if (linkEl) linkEl.href = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID;
+  // (seção snaps removida — dados vêm do backend)
   carregarConfigUrl();
 }
 
@@ -3668,11 +3476,8 @@ async function carregarConfigUrl() {
   if (!input) return;
   try {
     input.placeholder = 'Carregando...';
-    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/mes1!B1?key=${API_KEY}`);
-    if (!r.ok) { input.placeholder = 'Não foi possível carregar'; input.value = ''; return; }
-    const json = await r.json();
-    const val = json.values?.[0]?.[0] || '';
-    input.value = val;
+    var json = await fetchJSONP({ action: 'getConfig' });
+    input.value = json.dbUrl || '';
     input.placeholder = 'URL da planilha de planejamento';
   } catch (e) {
     input.placeholder = 'Erro ao carregar: ' + e.message;
@@ -3685,16 +3490,10 @@ async function salvarConfigUrl() {
   const url = input.value.trim();
   if (!url) { mostrarToast('⚠️ Digite a URL da planilha'); return; }
 
-  const params = new URLSearchParams({
-    action: 'updateConfig',
-    senha: url,
-  });
-
   try {
-    const res = await fetch(`${SCRIPT_URL}?${params}`);
-    const json = await res.json();
+    var json = await fetchJSONP({ action: 'updateConfig', dbUrl: url });
     if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
-    mostrarToast('✅ URL salva na planilha!');
+    mostrarToast('✅ URL salva!');
   } catch (e) {
     mostrarToast('❌ Erro: ' + e.message);
   }
@@ -3708,25 +3507,55 @@ let instEditandoId = null;
 let instTipoSelecionado = '';
 let instrutoresData = [];
 
-function setInstrutoresData(lista) {
-  instrutoresData = lista;
+const INSTRUTORES_SEED = [
+  { nome:'Diego', apelido:'DIEGO', tipo:'INSTRUTOR' },
+  { nome:'Gabriel', apelido:'GABRIEL', tipo:'INSTRUTOR' },
+  { nome:'Allan', apelido:'ALLAN', tipo:'AGENTE EDUCACIONAL' },
+  { nome:'Wagner', apelido:'WAGNER', tipo:'AGENTE EDUCACIONAL' },
+];
+
+async function apiInstrutores(action, extra) {
+  const params = { action, ...(extra||{}) };
+  try {
+    var json = await fetchJSONP(params);
+    if (!json.ok) throw new Error(json.error || 'Erro');
+    return json;
+  } catch (e) {
+    mostrarToast('❌ Erro: ' + e.message);
+    throw e;
+  }
 }
 
-function carregarInstrutores() {
-  fetch('instrutores.json')
-    .then(function(r) { return r.json(); })
-    .then(function(dados) {
-      instrutoresData = dados;
-    })
-    .catch(function() {
-      instrutoresData = [];
-    });
+async function carregarInstrutores() {
+  const json = await apiInstrutores('getInstrutores');
+  instrutoresData = json.dados || [];
+  return instrutoresData;
+}
+
+async function seedInstrutores() {
+  try {
+    const json = await apiInstrutores('getInstrutores');
+    if (json.dados && json.dados.length > 0) {
+      instrutoresData = json.dados;
+      return;
+    }
+    for (const p of INSTRUTORES_SEED) {
+      await apiInstrutores('addInstrutor', {
+        nome: p.nome,
+        apelido: p.apelido,
+        tipo: p.tipo,
+      });
+    }
+    instrutoresData = await carregarInstrutores();
+  } catch (e) {
+    instrutoresData = [];
+  }
 }
 
 function instChipsHtml(selectedStr, inputId, multi) {
   const selected = selectedStr ? selectedStr.toUpperCase().split('/').map(s => s.trim()).filter(Boolean) : [];
-  const data = instrutoresData.filter(p => p.ativo !== false);
-  const nomes = data.map(p => p.nickname).filter(Boolean);
+  const data = instrutoresData.length ? instrutoresData : INSTRUTORES_SEED;
+  const nomes = data.map(p => p.apelido).filter(Boolean);
   if (nomes.length === 0) return '';
   const chips = nomes.map(n => {
     const isSel = selected.includes(n);
@@ -3789,8 +3618,8 @@ function extrairNomesPlanejamento() {
   return [...nomes].sort();
 }
 
-function renderInstrutores() {
-  const dados = instrutoresData;
+async function renderInstrutores() {
+  const dados = await carregarInstrutores();
   const container = $('instrutor-lista');
   const empty = $('empty-instrutores');
   const count = $('count-instrutores');
@@ -3806,11 +3635,10 @@ function renderInstrutores() {
   let html = '';
   dados.forEach((p, idx) => {
     const tipoClass = p.tipo === 'INSTRUTOR' ? 'INSTRUTOR' : 'AGENTE';
-    const inicial = (p.nome || p.nickname || '?')[0].toUpperCase();
-    const nomeExib = p.nome || p.nickname || '—';
-    const nickExib = p.nickname && p.nickname !== p.nome ? p.nickname : '';
+    const inicial = (p.nome || p.apelido || '?')[0].toUpperCase();
+    const nomeExib = p.nome || p.apelido || '—';
+    const apelidoExib = p.apelido && p.apelido !== p.nome ? p.apelido : '';
     const idadeExib = p.idade ? p.idade + ' anos' : '';
-    const telZap = p.telefone ? p.telefone.replace(/\D/g, '') : '';
     const telExib = p.telefone || '';
     const statusClass = p.ativo === false ? 'inativo' : tipoClass;
     const statusLabel = p.ativo === false ? 'Inativo' : (p.tipo === 'INSTRUTOR' ? 'Instrutor' : 'Agente');
@@ -3819,11 +3647,11 @@ function renderInstrutores() {
       <div class="instrutor-card">
         <div class="instrutor-avatar ${tipoClass}">${inicial}</div>
         <div class="instrutor-info">
-          <div class="instrutor-nome">${nomeExib}${p.admin ? ' <span style="font-size:10px;color:var(--accent);font-weight:700;">ADMIN</span>' : ''}</div>
-          ${nickExib ? `<div class="instrutor-nickname">${nickExib}</div>` : ''}
+          <div class="instrutor-nome">${nomeExib}</div>
+          ${apelidoExib ? `<div class="instrutor-apelido">${apelidoExib}</div>` : ''}
           <div class="instrutor-meta">
             ${idadeExib ? `<span>🎂 ${idadeExib}</span>` : ''}
-            ${telZap ? `<span><a href="https://wa.me/55${telZap}" target="_blank" style="color:var(--green);text-decoration:none;">📞 ${telExib}</a></span>` : ''}
+            ${telExib ? `<span>📞 ${telExib}</span>` : ''}
           </div>
         </div>
         <div class="instrutor-tag ${statusClass}">${statusLabel}</div>
@@ -3843,14 +3671,13 @@ function mostrarFormInstrutor(instrutor) {
   title.textContent = instrutor ? 'Editar Cadastro' : 'Novo Cadastro';
 
   $('inst-nome').value = instrutor ? (instrutor.nome || '') : '';
-  $('inst-nickname').value = instrutor ? (instrutor.nickname || '') : '';
+  $('inst-apelido').value = instrutor ? (instrutor.apelido || '') : '';
   $('inst-nascimento').value = instrutor ? (instrutor.nascimento || '') : '';
   $('inst-idade').value = instrutor ? (instrutor.idade || '') : '';
   $('inst-telefone').value = instrutor ? (instrutor.telefone || '') : '';
   $('inst-email').value = instrutor ? (instrutor.email || '') : '';
   $('inst-endereco').value = instrutor ? (instrutor.endereco || '') : '';
   $('inst-obs').value = instrutor ? (instrutor.obs || '') : '';
-  $('inst-admin').checked = instrutor ? !!instrutor.admin : false;
 
   instTipoSelecionado = instrutor ? (instrutor.tipo || '') : '';
   $('inst-tipo').value = instTipoSelecionado;
@@ -3877,21 +3704,17 @@ function selectInstTipo(tipo) {
 }
 
 function calcularIdade() {
-  const val = $('inst-nascimento').value.trim();
-  if (!val || val.length < 10) { $('inst-idade').value = ''; return; }
-  const partes = val.split('/');
-  if (partes.length !== 3) { $('inst-idade').value = ''; return; }
-  const d = parseInt(partes[0]), m = parseInt(partes[1]) - 1, a = parseInt(partes[2]);
-  if (isNaN(d) || isNaN(m) || isNaN(a)) { $('inst-idade').value = ''; return; }
-  const nasc = new Date(a, m, d);
+  const nasc = $('inst-nascimento').value;
+  if (!nasc) { $('inst-idade').value = ''; return; }
   const hoje = new Date();
-  let idade = hoje.getFullYear() - nasc.getFullYear();
-  const mes = hoje.getMonth() - nasc.getMonth();
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nasc.getDate())) idade--;
+  const nascDate = new Date(nasc + 'T00:00:00');
+  let idade = hoje.getFullYear() - nascDate.getFullYear();
+  const mes = hoje.getMonth() - nascDate.getMonth();
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nascDate.getDate())) idade--;
   $('inst-idade').value = idade >= 0 ? idade : '';
 }
 
-function sugerirNicknamePorNome(val) {
+function sugerirApelidoPorNome(val) {
   const box = $('inst-sugestoes-nome');
   const upper = val.trim().toUpperCase();
   if (!upper || upper.length < 2) { box.style.display = 'none'; return; }
@@ -3901,15 +3724,15 @@ function sugerirNicknamePorNome(val) {
   if (!match) { box.style.display = 'none'; return; }
 
   box.style.display = 'block';
-  box.innerHTML = `<div class="inst-sugestao-item" onclick="vincularNickname('${match}')">🔗 Vincular a <strong>${match}</strong> (já existe no planejamento)</div>`;
+  box.innerHTML = `<div class="inst-sugestao-item" onclick="vincularApelido('${match}')">🔗 Vincular a <strong>${match}</strong> (já existe no planejamento)</div>`;
 }
 
-function vincularNickname(val) {
+function vincularApelido(val) {
   const nomeField = $('inst-nome');
   if (!nomeField.value.trim().toUpperCase().includes(val)) {
     nomeField.value = (nomeField.value.trim() + ' (' + val + ')').trim();
   }
-  $('inst-nickname').value = val;
+  $('inst-apelido').value = val;
   $('inst-sugestoes-nome').style.display = 'none';
   mostrarToast('🔗 Vinculado a ' + val);
 }
@@ -3921,14 +3744,7 @@ function mascararTelefone(el) {
   el.value = v;
 }
 
-function mascararData(el) {
-  let v = el.value.replace(/\D/g, '').slice(0, 8);
-  if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
-  if (v.length > 5) v = v.slice(0,5) + '/' + v.slice(5);
-  el.value = v;
-}
-
-function sugerirNickname(val) {
+function sugerirApelido(val) {
   const box = $('inst-sugestoes');
   const upper = val.trim().toUpperCase();
   if (!upper) { box.style.display = 'none'; return; }
@@ -3938,18 +3754,18 @@ function sugerirNickname(val) {
 
   box.style.display = 'block';
   box.innerHTML = sugestoes.map(s =>
-    `<div class="inst-sugestao-item" onclick="selecionarNickname('${s}')">${s}</div>`
+    `<div class="inst-sugestao-item" onclick="selecionarApelido('${s}')">${s}</div>`
   ).join('');
 }
 
-function selecionarNickname(val) {
-  $('inst-nickname').value = val;
+function selecionarApelido(val) {
+  $('inst-apelido').value = val;
   $('inst-sugestoes').style.display = 'none';
 }
 
 document.addEventListener('click', function(e) {
   const box = $('inst-sugestoes');
-  if (box && !e.target.closest('#inst-nickname') && !e.target.closest('#inst-sugestoes')) {
+  if (box && !e.target.closest('#inst-apelido') && !e.target.closest('#inst-sugestoes')) {
     box.style.display = 'none';
   }
   const boxNome = $('inst-sugestoes-nome');
@@ -3958,9 +3774,9 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function salvarInstrutor() {
+async function salvarInstrutor() {
   const nome = $('inst-nome').value.trim();
-  const nickname = $('inst-nickname').value.trim().toUpperCase();
+  const apelido = $('inst-apelido').value.trim().toUpperCase();
   const tipo = instTipoSelecionado;
 
   if (!nome) { mostrarErroInst('Informe o nome completo'); return; }
@@ -3968,9 +3784,8 @@ function salvarInstrutor() {
 
   const obj = {
     nome,
-    nickname: nickname || nome.toUpperCase(),
+    apelido: apelido || nome.toUpperCase(),
     tipo,
-    admin: $('inst-admin').checked,
     nascimento: $('inst-nascimento').value || '',
     idade: $('inst-idade').value || '',
     telefone: $('inst-telefone').value.trim() || '',
@@ -3979,23 +3794,20 @@ function salvarInstrutor() {
     obs: $('inst-obs').value.trim() || '',
   };
 
-  let lista = instrutoresData.slice();
-
-  if (instEditandoId) {
-    obj.id = instEditandoId;
-    const idx = lista.findIndex(p => p.id === instEditandoId);
-    if (idx !== -1) lista[idx] = obj;
-    mostrarToast('✅ Instrutor atualizado!');
-  } else {
-    obj.id = String(Date.now());
-    obj.cadastroEm = new Date().toISOString();
-    obj.ativo = true;
-    lista.push(obj);
-    mostrarToast('✅ Instrutor cadastrado!');
-  }
-  setInstrutoresData(lista);
-  fecharFormInstrutor();
-  renderInstrutores();
+  try {
+    if (instEditandoId) {
+      await apiInstrutores('updateInstrutor', { id: instEditandoId, ...obj });
+      mostrarToast('✅ Instrutor atualizado!');
+    } else {
+      obj.id = Date.now();
+      obj.cadastroEm = new Date().toISOString();
+      obj.ativo = true;
+      await apiInstrutores('addInstrutor', obj);
+      mostrarToast('✅ Instrutor cadastrado!');
+    }
+    fecharFormInstrutor();
+    await renderInstrutores();
+  } catch (e) {}
 }
 
 function editarInstrutor(idx) {
@@ -4004,15 +3816,15 @@ function editarInstrutor(idx) {
   mostrarFormInstrutor(p);
 }
 
-function excluirInstrutor(idx) {
+async function excluirInstrutor(idx) {
   if (!confirm('Tem certeza que deseja excluir este cadastro?')) return;
   const p = instrutoresData[idx];
   if (!p) return;
-  let lista = instrutoresData.slice();
-  lista.splice(idx, 1);
-  setInstrutoresData(lista);
-  mostrarToast('🗑️ Cadastro excluído');
-  renderInstrutores();
+  try {
+    await apiInstrutores('deleteInstrutor', { id: p.id });
+    mostrarToast('🗑️ Cadastro excluído');
+    await renderInstrutores();
+  } catch (e) {}
 }
 
 function mostrarErroInst(msg) {
@@ -4031,7 +3843,7 @@ atualizarLabels();
 initPin();
 loadConfig();
 carregar();
-carregarInstrutores();
+seedInstrutores();
 
 // Auto sync with configurable interval
 reiniciarSyncTimer();
@@ -4045,7 +3857,7 @@ window.addEventListener('resize', () => {
   const w = window.innerWidth;
   if ((lastWidth <= 768 && w > 768) || (lastWidth > 768 && w <= 768)) {
     $('sidebar').style.transform = '';
-    if (w > 768 && !$('sidebar').classList.contains('pinned')) {
+    if (w > 768 && !$('sidebar').classList.contains('pinned') && !localStorage.getItem('nave_config_sidebarMode')) {
       $('sidebar').classList.add('hidden');
       sidebarOpen = false;
     }
