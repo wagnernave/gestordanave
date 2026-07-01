@@ -1093,9 +1093,9 @@
             <div class="field-group">
               <label class="field-label">Data *</label>
               <div style="position:relative;">
-                <input class="field-input" id="naf-data" placeholder="DD/MM/AAAA" autocomplete="off" readonly
-                  onclick="toggleNAFCal();setTimeout(atualizarCodigoPreview,100)" style="cursor:pointer;padding-right:36px;">
-                <span onclick="toggleNAFCal()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text3);">📅</span>
+                <input class="field-input" id="naf-data" placeholder="DD/MM/AAAA" autocomplete="off"
+                  onclick="toggleNAFCal()" oninput="mascaraData(this);setTimeout(atualizarCodigoPreview,10)" style="cursor:pointer;padding-right:36px;">
+                <span onclick="event.stopPropagation();toggleNAFCal()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text3);">📅</span>
                 <div id="naf-cal" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:2000;
                   background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;
                   box-shadow:0 12px 40px rgba(0,0,0,0.5);width:280px;">
@@ -1856,7 +1856,23 @@ function abrirModal(db, idx) {
     <div class="field"><label>Turma</label><div class="val">${escapeHtml(item.turmaAberta || '—')}</div></div>
     <div class="field"><label>Público</label><div class="val">${escapeHtml(item.publicoAlvo || '—')}</div></div>
     <div class="field"><label>Turno</label><div class="val">${escapeHtml(item.turno || '—')}</div></div>
-    <div class="field"><label>Data</label><div class="val">${escapeHtml(dataVal || '—')}</div></div>
+    <div class="field"><label>Data</label>
+      <div style="position:relative;flex:1">
+        <input id="f-data" class="modal-input" value="${escapeHtml(dataVal)}" placeholder="DD/MM/AAAA" style="cursor:pointer;padding-right:36px;"
+          onclick="toggleModalCal(event)" oninput="mascaraData(this)" autocomplete="off">
+        <span onclick="event.stopPropagation();toggleModalCal(event)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text3);">📅</span>
+        <div id="modal-cal" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:2000;
+          background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;
+          box-shadow:0 12px 40px rgba(0,0,0,0.5);width:280px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div onclick="modalmoverMes(-1)" style="cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:14px;">‹</div>
+            <span id="modal-cal-label" style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;"></span>
+            <div onclick="modalmoverMes(1)" style="cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:14px;">›</div>
+          </div>
+          <div id="modal-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:12px;"></div>
+        </div>
+      </div>
+    </div>
     <div class="field"><label>Horário</label>
       <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1">
         ${['09h às 12h','14h às 17h','18h às 21h'].map(h =>
@@ -1924,12 +1940,13 @@ async function salvar() {
   var horario = ($('f-horario')?.value || '').trim();
   var instrutor = ($('f-instrutores')?.value || '').trim();
   var local = ($('f-local')?.value || '').trim();
+  var data = ($('f-data')?.value || '').trim();
 
   try {
     var json = await fetchJSONP({
       action: 'updateStatus',
       codigo: item.codigo || '',
-      data: item.data || '',
+      data: data || item.data || '',
       nome: item.nome || '',
       tipo: item.tipo || '',
       eixo: item.eixo || '',
@@ -1945,6 +1962,28 @@ async function salvar() {
     });
     if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
 
+    // Também salva no newclass.json para sobreposição
+    try {
+      await fetchJSONP({
+        action: 'updateAtividade',
+        codigo: item.codigo || '',
+        data: data || item.data || '',
+        nome: item.nome || '',
+        tipo: item.tipo || '',
+        eixo: item.eixo || '',
+        vagas: String(item.vagas || ''),
+        parceria: item.parceria || '',
+        turmaAberta: item.turmaAberta || '',
+        publicoAlvo: item.publicoAlvo || '',
+        turno: item.turno || '',
+        horario: horario,
+        instrutor: instrutor,
+        local: local,
+        status: statusSel || 'CONFIRMADA'
+      });
+    } catch (_) { /* falha silenciosa — o updateStatus já salvou */ }
+
+    item.data = data || item.data;
     item.horario = horario;
     item.instrutores = instrutor;
     item.local = local;
@@ -2141,7 +2180,21 @@ function abrirModalPanel(item, db, idx) {
     <div class="field-group"><span class="field-label">Vagas</span>
       <input class="field-input" id="panel-vagas" value="${item.vagas || ''}"></div>
     <div class="field-group"><span class="field-label">Data</span>
-      <input class="field-input" id="panel-data" value="${escapeHtml(dataVal || '—')}" readonly></div>
+      <div style="position:relative;flex:1">
+        <input class="field-input" id="panel-data" value="${escapeHtml(dataVal)}" placeholder="DD/MM/AAAA" autocomplete="off"
+          onclick="togglePanelCal(event)" oninput="mascaraData(this)" style="cursor:pointer;padding-right:36px;">
+        <span onclick="event.stopPropagation();togglePanelCal(event)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--text3);">📅</span>
+        <div id="panel-cal" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:2000;
+          background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;
+          box-shadow:0 12px 40px rgba(0,0,0,0.5);width:280px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div onclick="panelmoverMes(-1)" style="cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:14px;">‹</div>
+            <span id="panel-cal-label" style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;"></span>
+            <div onclick="panelmoverMes(1)" style="cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:14px;">›</div>
+          </div>
+          <div id="panel-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:12px;"></div>
+        </div>
+      </div></div>
     <div class="field-group"><span class="field-label">Horário</span>
       <div style="display:flex;flex-wrap:wrap;gap:4px;">
         ${['09h às 12h','14h às 17h','18h às 21h'].map(h =>
@@ -2212,12 +2265,13 @@ async function salvarPanel() {
   var horario = ($('panel-horario')?.value || '').trim();
   var local = ($('panel-local')?.value || '').trim();
   var instrutor = ($('panel-instrutores')?.value || '').trim();
+  var data = ($('panel-data')?.value || '').trim();
 
   try {
     var json = await fetchJSONP({
       action: 'updateStatus',
       codigo: item.codigo || '',
-      data: item.data || '',
+      data: data || item.data || '',
       nome: item.nome || '',
       tipo: item.tipo || '',
       eixo: item.eixo || '',
@@ -2233,6 +2287,28 @@ async function salvarPanel() {
     });
     if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
 
+    // Também salva no newclass.json para sobreposição
+    try {
+      await fetchJSONP({
+        action: 'updateAtividade',
+        codigo: item.codigo || '',
+        data: data || item.data || '',
+        nome: item.nome || '',
+        tipo: item.tipo || '',
+        eixo: item.eixo || '',
+        vagas: String(item.vagas || ''),
+        parceria: item.parceria || '',
+        turmaAberta: item.turmaAberta || '',
+        publicoAlvo: item.publicoAlvo || '',
+        turno: item.turno || '',
+        horario: horario,
+        instrutor: instrutor,
+        local: local,
+        status: panelStatus || 'CONFIRMADA'
+      });
+    } catch (_) { /* falha silenciosa */ }
+
+    item.data = data || item.data;
     item.horario = horario;
     item.local = local;
     item.instrutores = instrutor;
@@ -3319,6 +3395,164 @@ function selecionarNAFData(dateStr) {
   $('naf-cal').style.display = 'none';
   document.removeEventListener('click', fecharNAFCalFora);
   renderNAFCal();
+  atualizarCodigoPreview();
+}
+
+// ── Date mask ──
+function mascaraData(inp) {
+  var v = inp.value.replace(/\D/g, '').slice(0, 8);
+  var r = '';
+  for (var i = 0; i < v.length; i++) {
+    if (i === 2 || i === 4) r += '/';
+    r += v[i];
+  }
+  inp.value = r;
+}
+
+// ── Modal Calendar ──
+var modalCalMes = new Date().getMonth();
+var modalCalAno = new Date().getFullYear();
+
+function toggleModalCal(e) {
+  if (e) e.stopPropagation();
+  const cal = $('modal-cal');
+  if (!cal) return;
+  if (cal.style.display === 'none' || !cal.style.display) {
+    const dataVal = $('f-data').value;
+    if (dataVal) {
+      var p = dataVal.split('/');
+      if (p.length === 3) { modalCalMes = parseInt(p[1]) - 1; modalCalAno = parseInt(p[2]); }
+    }
+    renderModalCal();
+    cal.style.display = 'block';
+    setTimeout(function() { document.addEventListener('click', fecharModalCalFora); }, 10);
+  } else {
+    cal.style.display = 'none';
+    document.removeEventListener('click', fecharModalCalFora);
+  }
+}
+function fecharModalCalFora(e) {
+  const cal = $('modal-cal');
+  if (!cal) return;
+  const wrapper = cal.parentElement;
+  if (!wrapper.contains(e.target)) {
+    cal.style.display = 'none';
+    document.removeEventListener('click', fecharModalCalFora);
+  }
+}
+function modalmoverMes(delta) {
+  modalCalMes += delta;
+  if (modalCalMes > 11) { modalCalMes = 0; modalCalAno++; }
+  if (modalCalMes < 0) { modalCalMes = 11; modalCalAno--; }
+  renderModalCal();
+}
+function renderModalCal() {
+  const label = $('modal-cal-label');
+  if (label) label.textContent = NA_MESES[modalCalMes] + ' ' + modalCalAno;
+  const grid = $('modal-cal-grid');
+  if (!grid) return;
+  const firstDay = new Date(modalCalAno, modalCalMes, 1).getDay();
+  const daysInMonth = new Date(modalCalAno, modalCalMes + 1, 0).getDate();
+  const today = new Date();
+  const selectedVal = $('f-data').value;
+  const dayNames = ['D','S','T','Q','Q','S','S'];
+  let html = dayNames.map(function(d) { return '<div style="font-size:10px;color:var(--text3);font-weight:600;padding:3px 0;">' + d + '</div>'; }).join('');
+  for (var i = 0; i < firstDay; i++) html += '<div></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dd = String(d).padStart(2, '0');
+    var mm = String(modalCalMes + 1).padStart(2, '0');
+    var dateStr = dd + '/' + mm + '/' + modalCalAno;
+    var isToday = d === today.getDate() && modalCalMes === today.getMonth() && modalCalAno === today.getFullYear();
+    var isSelected = dateStr === selectedVal;
+    var style = 'padding:5px 2px;border-radius:6px;cursor:pointer;transition:background 0.1s;';
+    if (isSelected) style += 'background:var(--accent);color:white;font-weight:700;';
+    else if (isToday) style += 'background:var(--accent-glow);color:var(--accent);font-weight:700;border:1px solid var(--accent);';
+    else style += 'color:var(--text2);';
+    html += '<div style="' + style + '"'
+      + ' onmouseover="if(!this.dataset.sel)this.style.background=\'var(--bg3)\'"'
+      + ' onmouseout="if(!this.dataset.sel)this.style.background=\'\'"'
+      + ' onclick="selecionarModalData(\'' + dateStr + '\')">' + d + '</div>';
+  }
+  grid.innerHTML = html;
+}
+function selecionarModalData(dateStr) {
+  $('f-data').value = dateStr;
+  $('modal-cal').style.display = 'none';
+  document.removeEventListener('click', fecharModalCalFora);
+  renderModalCal();
+}
+
+// ── Panel Calendar ──
+var panelCalMes = new Date().getMonth();
+var panelCalAno = new Date().getFullYear();
+
+function togglePanelCal(e) {
+  if (e) e.stopPropagation();
+  const cal = $('panel-cal');
+  if (!cal) return;
+  if (cal.style.display === 'none' || !cal.style.display) {
+    const dataVal = $('panel-data').value;
+    if (dataVal) {
+      var p = dataVal.split('/');
+      if (p.length === 3) { panelCalMes = parseInt(p[1]) - 1; panelCalAno = parseInt(p[2]); }
+    }
+    renderPanelCal();
+    cal.style.display = 'block';
+    setTimeout(function() { document.addEventListener('click', fecharPanelCalFora); }, 10);
+  } else {
+    cal.style.display = 'none';
+    document.removeEventListener('click', fecharPanelCalFora);
+  }
+}
+function fecharPanelCalFora(e) {
+  const cal = $('panel-cal');
+  if (!cal) return;
+  const wrapper = cal.parentElement;
+  if (!wrapper.contains(e.target)) {
+    cal.style.display = 'none';
+    document.removeEventListener('click', fecharPanelCalFora);
+  }
+}
+function panelmoverMes(delta) {
+  panelCalMes += delta;
+  if (panelCalMes > 11) { panelCalMes = 0; panelCalAno++; }
+  if (panelCalMes < 0) { panelCalMes = 11; panelCalAno--; }
+  renderPanelCal();
+}
+function renderPanelCal() {
+  const label = $('panel-cal-label');
+  if (label) label.textContent = NA_MESES[panelCalMes] + ' ' + panelCalAno;
+  const grid = $('panel-cal-grid');
+  if (!grid) return;
+  const firstDay = new Date(panelCalAno, panelCalMes, 1).getDay();
+  const daysInMonth = new Date(panelCalAno, panelCalMes + 1, 0).getDate();
+  const today = new Date();
+  const selectedVal = $('panel-data').value;
+  const dayNames = ['D','S','T','Q','Q','S','S'];
+  let html = dayNames.map(function(d) { return '<div style="font-size:10px;color:var(--text3);font-weight:600;padding:3px 0;">' + d + '</div>'; }).join('');
+  for (var i = 0; i < firstDay; i++) html += '<div></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dd = String(d).padStart(2, '0');
+    var mm = String(panelCalMes + 1).padStart(2, '0');
+    var dateStr = dd + '/' + mm + '/' + panelCalAno;
+    var isToday = d === today.getDate() && panelCalMes === today.getMonth() && panelCalAno === today.getFullYear();
+    var isSelected = dateStr === selectedVal;
+    var style = 'padding:5px 2px;border-radius:6px;cursor:pointer;transition:background 0.1s;';
+    if (isSelected) style += 'background:var(--accent);color:white;font-weight:700;';
+    else if (isToday) style += 'background:var(--accent-glow);color:var(--accent);font-weight:700;border:1px solid var(--accent);';
+    else style += 'color:var(--text2);';
+    html += '<div style="' + style + '"'
+      + ' onmouseover="if(!this.dataset.sel)this.style.background=\'var(--bg3)\'"'
+      + ' onmouseout="if(!this.dataset.sel)this.style.background=\'\'"'
+      + ' onclick="selecionarPanelData(\'' + dateStr + '\')">' + d + '</div>';
+  }
+  grid.innerHTML = html;
+}
+function selecionarPanelData(dateStr) {
+  $('panel-data').value = dateStr;
+  $('panel-cal').style.display = 'none';
+  document.removeEventListener('click', fecharPanelCalFora);
+  renderPanelCal();
 }
 
 // ── NA CRUD ──
