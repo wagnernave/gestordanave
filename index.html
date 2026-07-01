@@ -1799,8 +1799,10 @@ function renderizar() {
   }
 
   const dbKey = abaAtiva;
+  const original = isDb1 ? DB1 : DB2;
   let html = '<div class="cards">';
   dados.forEach((item, i) => {
+    const origIdx = original.indexOf(item);
     const s = item.status || 'CONFIRMADA';
     const tipoStr = (item.tipo || '').toLowerCase();
     const tipoClass = tipoStr.replace(/[^a-z0-9]/g, '-') || 'outro';
@@ -1812,7 +1814,7 @@ function renderizar() {
     if (item.eixo) meta.push(`<span class="card-meta-item"><span class="ico">🏷️</span>${item.eixo}</span>`);
 
     html += `
-      <div class="card status-${s} tipo-${tipoClass}" onclick="abrirModal('${dbKey}',${i})">
+      <div class="card status-${s} tipo-${tipoClass}" onclick="abrirModal('${dbKey}',${origIdx})">
         <div class="card-top">
           <span class="card-san">${item.san || item.id || ''}</span>
           <span class="card-tipo">${item.tipo || '—'}</span>
